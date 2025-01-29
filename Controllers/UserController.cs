@@ -35,6 +35,11 @@ namespace HotelBooking.Controllers
             {
                 return BadRequest(ModelState);
             }
+            var found = _context.Users.FirstOrDefault(entity => entity.Email == user.Email);
+            if(found != null)
+            {
+                return BadRequest("User already exists");
+            }
             User newUser = _mapper.Map<User>(user);
             newUser.Id = Guid.NewGuid();
             _context.Users.Add(newUser);
