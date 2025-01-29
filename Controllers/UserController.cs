@@ -61,5 +61,35 @@ namespace HotelBooking.Controllers
            await _context.SaveChangesAsync();
            return Ok(new { result.Id, accessToken, refreshToken.Token });
         }
-    }
+        [HttpPost("refresh-access-token")]
+        public async Task<IActionResult> RefreshToken(string token)
+        {
+            var result = await _tokenGenerator.RefreshAccessTokenAsync(token);
+            return Ok(result);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(Guid id,UpdateUserDto newUser)
+        {
+            var found = await _context.Users.FirstOrDefaultAsync(entity => entity.Id == id);
+            if(found == null)
+            {
+                return NotFound();
+            }
+            found = _mapper.Map(newUser,found);
+            await _context.SaveChangesAsync();
+            return Ok("Profile Updated");
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> UpdateUser(Guid id)
+        {
+            var found = await _context.Users.FirstOrDefaultAsync(entity => entity.Id == id);
+            if (found == null)
+            {
+                return NotFound();
+            }
+            _context.Users.Remove(found);
+            await _context.SaveChangesAsync();
+            return Ok("Profile Deleted");
+        }
+        }
 }
