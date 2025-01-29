@@ -9,5 +9,6 @@
         public string Role { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public ICollection<UserForHotel> UserForHotels { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; }
     }
 }
