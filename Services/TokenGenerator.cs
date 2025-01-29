@@ -8,7 +8,7 @@ using System.Text;
 
 namespace HotelBooking.Services
 {
-    public class TokenGenerator
+    public class TokenGenerator : ITokenGenerator
     {
         public readonly Context _context;
         public readonly IConfiguration _configuration;

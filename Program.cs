@@ -1,4 +1,6 @@
+using AutoMapper;
 using HotelBooking.Data;
+using HotelBooking.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,7 +14,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 DotNetEnv.Env.Load();
 var connection = Environment.GetEnvironmentVariable("connection");
 var key = Environment.GetEnvironmentVariable("Key");

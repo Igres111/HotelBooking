@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HotelBooking.DTOs;
+using HotelBooking.DTOs.UserDtos;
 using HotelBooking.Models;
 
 namespace HotelBooking.Profiles
@@ -9,6 +9,7 @@ namespace HotelBooking.Profiles
         public UserProfile()
         {
             CreateMap<User,RegisterDto>().ReverseMap();
+            CreateMap<User, LoginDto>().ReverseMap();
         }
     }
 }
