@@ -14,14 +14,10 @@ namespace HotelBooking.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        public readonly Context _context;
-        public readonly IMapper _mapper;
         public readonly ITokenGenerator _tokenGenerator;
         public readonly IUserRepository _methods;
-        public UserController(Context context, IMapper mapper, ITokenGenerator tokenGenerator, IUserRepository methods)
+        public UserController(ITokenGenerator tokenGenerator, IUserRepository methods)
         {
-            _context = context;
-            _mapper = mapper;
             _tokenGenerator = tokenGenerator;
             _methods = methods;
         }
