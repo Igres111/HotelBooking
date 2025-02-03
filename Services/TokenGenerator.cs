@@ -56,6 +56,7 @@ namespace HotelBooking.Services
                 ExpirationDate = DateTime.Now.AddDays(7),
                 UserId = user.Id,
             };
+
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
             return refreshToken;

@@ -2,6 +2,7 @@
 using HotelBooking.Data;
 using HotelBooking.DTOs.UserDtos;
 using HotelBooking.Models;
+using HotelBooking.Repositories.UserRepo;
 using HotelBooking.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +17,19 @@ namespace HotelBooking.Controllers
         public readonly Context _context;
         public readonly IMapper _mapper;
         public readonly ITokenGenerator _tokenGenerator;
-        public UserController(Context context, IMapper mapper, ITokenGenerator tokenGenerator)
+        public readonly IUserRepository _methods;
+        public UserController(Context context, IMapper mapper, ITokenGenerator tokenGenerator, IUserRepository methods)
         {
             _context = context;
             _mapper = mapper;
             _tokenGenerator = tokenGenerator;
+            _methods = methods;
         }
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
-            return Ok(users);
+            var result = await _methods.ReceiveUsers();
+            return Ok(result);
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto user)
@@ -35,31 +38,18 @@ namespace HotelBooking.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var found = _context.Users.FirstOrDefault(entity => entity.Email == user.Email);
-            if(found != null)
-            {
-                return BadRequest("User already exists");
-            }
-            User newUser = _mapper.Map<User>(user);
-            newUser.Id = Guid.NewGuid();
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
+            await _methods.RegisterUser(user);
             return Ok();
         }
         [HttpPost("login")]
-        public async Task<IActionResult> Register(LoginDto user)
+        public async Task<IActionResult> Login(LoginDto user)
         {
-            var result = _context
-                .Users
-                .FirstOrDefault(entity => entity.Email == user.Email && entity.Password == user.Password);
-            if (result == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(ModelState);
             }
-           var refreshToken= await _tokenGenerator.CreateRefreshTokenAsync(result);
-           var accessToken = _tokenGenerator.CreateAccessToken(result);
-           await _context.SaveChangesAsync();
-           return Ok(new { result.Id, accessToken, refreshToken.Token });
+            var result = await _methods.LoginUser(user);
+            return Ok(result);
         }
         [HttpPost("refresh-access-token")]
         public async Task<IActionResult> RefreshToken(string token)
@@ -68,27 +58,15 @@ namespace HotelBooking.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id,UpdateUserDto newUser)
+        public async Task<IActionResult> Update(Guid id,UpdateUserDto newUser)
         {
-            var found = await _context.Users.FirstOrDefaultAsync(entity => entity.Id == id);
-            if(found == null)
-            {
-                return NotFound();
-            }
-            found = _mapper.Map(newUser,found);
-            await _context.SaveChangesAsync();
+            await _methods.UpdateUser(id, newUser);
             return Ok("Profile Updated");
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var found = await _context.Users.FirstOrDefaultAsync(entity => entity.Id == id);
-            if (found == null)
-            {
-                return NotFound();
-            }
-            _context.Users.Remove(found);
-            await _context.SaveChangesAsync();
+            await _methods.DeleteUser(id);
             return Ok("Profile Deleted");
         }
         }

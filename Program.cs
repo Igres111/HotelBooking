@@ -1,5 +1,6 @@
 using AutoMapper;
 using HotelBooking.Data;
+using HotelBooking.Repositories.UserRepo;
 using HotelBooking.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 DotNetEnv.Env.Load();
 var connection = Environment.GetEnvironmentVariable("connection");
 var key = Environment.GetEnvironmentVariable("Key");

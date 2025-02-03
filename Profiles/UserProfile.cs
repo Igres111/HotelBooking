@@ -8,8 +8,9 @@ namespace HotelBooking.Profiles
     {
         public UserProfile()
         {
-            CreateMap<User, RegisterDto>();
-            CreateMap<User, UpdateUserDto>();
+            CreateMap<User, RegisterDto>().ReverseMap().ForMember(dest => dest.Password, opt => opt.Ignore());
+            CreateMap<User, UpdateUserDto>().ReverseMap();
+            CreateMap<User, ReceiveUserDto>().ReverseMap();
         }
     }
 }
