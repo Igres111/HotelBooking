@@ -20,9 +20,23 @@ namespace HotelBooking.Controllers
             _mapper = mapper;
             _methods = methods;
         }
-        [HttpPost("RegisterHotel")]
+        [HttpGet]
+        public async Task<IActionResult> GetHotels()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result =await _methods.GetHotelsList();
+            return Ok("Hotels List");
+        }
+        [HttpPost("Register-Hotel")]
         public async Task<IActionResult> Register(RegisterHotelDto hotel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _methods.RegisterHotel(hotel);
             return Ok("Registered Succesfully");
         }

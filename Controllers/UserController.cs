@@ -56,6 +56,10 @@ namespace HotelBooking.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id,UpdateUserDto newUser)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _methods.UpdateUser(id, newUser);
             return Ok("Profile Updated");
         }

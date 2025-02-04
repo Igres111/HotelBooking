@@ -23,10 +23,10 @@ namespace HotelBooking.Repositories.HotelRepo
             await _context.Hotels.AddAsync(newHotel);
             await _context.SaveChangesAsync();
         }
-        public async Task GetHotelsList()
+        public async Task<List<Hotel>> GetHotelsList()
         {
             var hotels = await _context.Hotels.ToListAsync();
-            
+            return _mapper.Map<List<Hotel>>(hotels);
         }
     }
 }
