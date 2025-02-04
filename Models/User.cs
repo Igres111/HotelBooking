@@ -10,5 +10,6 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public ICollection<UserForHotel> UserForHotels { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
+        public List<Reviews> Reviews { get; set; }
     }
 }

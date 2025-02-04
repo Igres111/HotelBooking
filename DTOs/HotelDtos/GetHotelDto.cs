@@ -1,25 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelBooking.Models;
 
 namespace HotelBooking.DTOs.HotelDtos
 {
     public class GetHotelDto
     {
-        [Required]
-        [StringLength(50)]
+        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        [Required]
-        [StringLength(50)]
         public string Address { get; set; } = string.Empty;
-        [Required]
-        [StringLength(50)]
         public string City { get; set; } = string.Empty;
-        [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Price per night must be a non-negative value.")]
         public float PricePerNight { get; set; }
-        public float AvgRating { get; set; } = 0;
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be a positive integer.")]
+        public float AvgRating { get; set; }
+        public float StarReviews { get; set; }
         public int Capacity { get; set; }
-        public string? Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }

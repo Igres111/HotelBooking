@@ -5,6 +5,7 @@ namespace HotelBooking.Repositories.HotelRepo
 {
     public interface IHotelRepository
     {
-        public Task RegisterHotel(GetHotelDto hotel);
+        public Task RegisterHotel(RegisterHotelDto hotel);
+        public Task GetHotelsList();
     }
 }

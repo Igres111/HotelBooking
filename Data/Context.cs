@@ -8,6 +8,7 @@ namespace HotelBooking.Data
         public Context(DbContextOptions<Context> options) : base(options) {}
         public DbSet<User> Users { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
+        public DbSet<Reviews> Reviews { get; set; }
         public DbSet<UserForHotel> UserForHotels { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,14 +26,26 @@ namespace HotelBooking.Data
                .WithMany(entity => entity.UserForHotels)
                .HasForeignKey(entity => entity.HotelId)
                .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasOne(entity => entity.User)
+                .WithMany(entity => entity.RefreshTokens)
+                .HasForeignKey(entity => entity.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<Reviews>(entity =>
+            {
+                entity.HasKey(entity => entity.Id);
+                entity.HasOne(entity => entity.User)
+                .WithMany(entity => entity.Reviews)
+                .HasForeignKey(entity => entity.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                modelBuilder.Entity<RefreshToken>(entity =>
-                {
-                    entity.HasOne(entity => entity.User)
-                    .WithMany(entity => entity.RefreshTokens)
-                    .HasForeignKey(entity => entity.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                });
+                entity.HasOne(entity => entity.Hotel)
+                .WithMany(entity => entity.Reviews)
+                .HasForeignKey(entity => entity.HotelId)
+                .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

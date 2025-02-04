@@ -21,7 +21,7 @@ namespace HotelBooking.Controllers
             _methods = methods;
         }
         [HttpPost("RegisterHotel")]
-        public async Task<IActionResult> Register(GetHotelDto hotel)
+        public async Task<IActionResult> Register(RegisterHotelDto hotel)
         {
             await _methods.RegisterHotel(hotel);
             return Ok("Registered Succesfully");

@@ -7,7 +7,7 @@ namespace HotelBooking.Profiles
     {
         public HotelProfile()
         {
-            CreateMap<Hotel, GetHotelDto>().ReverseMap();
+            CreateMap<Hotel, RegisterHotelDto>().ReverseMap();
         }
     }
 }
