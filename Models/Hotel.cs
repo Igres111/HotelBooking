@@ -13,5 +13,6 @@
         public string Description { get; set; } = string.Empty;
         public List<UserForHotel> UserForHotels { get; set; }
         public List<Reviews> Reviews { get; set; }
+        public List<BillingInfo> BillingInfos { get; set; }
     }
 }
