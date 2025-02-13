@@ -37,13 +37,26 @@ namespace HotelBooking.Controllers
                return NotFound("Booking not found");
             }
         }
-        [HttpGet("Bookings/{userId}")]
+        [HttpGet("Users/{userId}/Bookings")]
         public async Task<IActionResult> BookingByUsers(Guid userId)
         {
             try
             {
                 var result = await _methods.GetBookingByUser(userId);
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return NotFound("Booking not found");
+            }
+        }
+        [HttpDelete("Bookings/{id}")]
+        public async Task<IActionResult> DeleteBooking(Guid id)
+        {
+            try
+            {
+                await _methods.DeleteBooking(id);
+                return Ok("Booking deleted");
             }
             catch (Exception)
             {

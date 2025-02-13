@@ -45,5 +45,15 @@ namespace HotelBooking.Repositories.BookingRepo
             }
             return _mapper.Map<ReceiveBookingDto>(result);
         }
+        public async Task DeleteBooking(Guid id)
+        {
+            var booking = await _context.BookingInfos.FirstOrDefaultAsync(x => x.Id == id);
+            if (booking == null)
+            {
+                throw new Exception("Booking not found");
+            }
+            _context.BookingInfos.Remove(booking);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace HotelBooking.Repositories.BookingRepo
         public Task<BookingInfoDto> BookHotel(BookingInfoDto info);
         public Task<ReceiveBookingDto> GetBookingById(Guid id);
         public Task<ReceiveBookingDto> GetBookingByUser(Guid userId);
+        public Task DeleteBooking(Guid id);
     }
 }
