@@ -14,7 +14,7 @@ namespace HotelBooking.Controllers
         {
             _methods = methods;
         }
-        [HttpPost("Book-Hotel")]
+        [HttpPost("Booking")]
         public async Task<IActionResult> BookingHotel(BookingInfoDto info)
         {
             if (!ModelState.IsValid)
@@ -35,6 +35,19 @@ namespace HotelBooking.Controllers
             catch (Exception)
             {
                return NotFound("Booking not found");
+            }
+        }
+        [HttpGet("Bookings/{userId}")]
+        public async Task<IActionResult> BookingByUsers(Guid userId)
+        {
+            try
+            {
+                var result = await _methods.GetBookingByUser(userId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return NotFound("Booking not found");
             }
         }
     }

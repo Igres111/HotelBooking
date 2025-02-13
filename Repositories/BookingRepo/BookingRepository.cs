@@ -36,5 +36,14 @@ namespace HotelBooking.Repositories.BookingRepo
             }
             return _mapper.Map<ReceiveBookingDto>(result);
         }
+        public async Task<ReceiveBookingDto> GetBookingByUser(Guid userId)
+        {
+            var result = await _context.BookingInfos.FirstOrDefaultAsync(x => x.UserId == userId);
+            if (result == null)
+            {
+                throw new Exception("Booking not found");
+            }
+            return _mapper.Map<ReceiveBookingDto>(result);
+        }
     }
 }
