@@ -24,5 +24,18 @@ namespace HotelBooking.Controllers
            var result = await _methods.BookHotel(info);
             return Ok(result);
         }
+        [HttpGet("Bookings/{id}")]
+        public async Task<IActionResult> GetBookingById(Guid id)
+        {
+            try
+            {
+                var result = await _methods.GetBookingById(id);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+               return NotFound("Booking not found");
+            }
+        }
     }
 }

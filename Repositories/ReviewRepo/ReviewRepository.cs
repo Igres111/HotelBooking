@@ -55,7 +55,6 @@ namespace HotelBooking.Repositories.ReviewRepo
                         Email = r.User.Email,
                     }).ToList()
                 }).ToListAsync();
-
             return result;
         }
     }

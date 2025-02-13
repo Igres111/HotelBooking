@@ -2,6 +2,7 @@
 using HotelBooking.Data;
 using HotelBooking.DTOs.BookingDtos;
 using HotelBooking.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Repositories.BookingRepo
 {
@@ -18,11 +19,22 @@ namespace HotelBooking.Repositories.BookingRepo
         {
             BookingInfo billing =  _mapper.Map<BookingInfo>(info);
             billing.Id = Guid.NewGuid();
+            _context.BookingInfos.Add(billing);
+
             UserForHotel user = new UserForHotel { HotelId = info.HotelId, UserId = info.UserId };
             _context.UserForHotels.Add(user);
-            _context.BookingInfos.Add(billing);
+
             await _context.SaveChangesAsync();
             return  info;
+        }
+        public async Task<ReceiveBookingDto> GetBookingById(Guid id)
+        {
+            var result =await _context.BookingInfos.FirstOrDefaultAsync(x =>x.Id == id);
+            if (result == null)
+            {
+                throw new Exception("Booking not found");
+            }
+            return _mapper.Map<ReceiveBookingDto>(result);
         }
     }
 }
