@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Models
 {
-    public class BillingInfo
+    public class BookingInfo
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
@@ -11,6 +11,7 @@ namespace HotelBooking.Models
         public DateTime CheckOut { get; set; }
         public int NumberOfGuests { get; set; }
         public bool PrePaid { get; set; }
+        public decimal TotalPrice { get; set; }
         [ForeignKey(nameof(HotelId))]
         public Hotel Hotel { get; set; }
         [ForeignKey(nameof(UserId))]

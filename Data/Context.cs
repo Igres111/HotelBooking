@@ -11,7 +11,7 @@ namespace HotelBooking.Data
         public DbSet<Reviews> Reviews { get; set; }
         public DbSet<UserForHotel> UserForHotels { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<BillingInfo> BillingInfos { get; set; }
+        public DbSet<BookingInfo> BookingInfos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasKey(entity => entity.Id);
@@ -48,7 +48,7 @@ namespace HotelBooking.Data
                 .HasForeignKey(entity => entity.HotelId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-            modelBuilder.Entity<BillingInfo>(entity =>
+            modelBuilder.Entity<BookingInfo>(entity =>
             {
                 entity.HasKey(entity => entity.Id);
                 entity.HasOne(entity => entity.User)

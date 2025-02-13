@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250129103745_Add Tokens")]
-    partial class AddTokens
+    [Migration("20250213171419_Recreate Db")]
+    partial class RecreateDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,42 @@ namespace HotelBooking.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("HotelBooking.Models.BookingInfo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CheckIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CheckOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("NumberOfGuests")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PrePaid")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BookingInfos");
+                });
 
             modelBuilder.Entity("HotelBooking.Models.Hotel", b =>
                 {
@@ -56,8 +92,8 @@ namespace HotelBooking.Migrations
                     b.Property<float>("PricePerNight")
                         .HasColumnType("real");
 
-                    b.Property<int>("Reviews")
-                        .HasColumnType("int");
+                    b.Property<float>("StarReviews")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -85,6 +121,36 @@ namespace HotelBooking.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Reviews", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.User", b =>
@@ -126,14 +192,30 @@ namespace HotelBooking.Migrations
                     b.Property<Guid>("HotelId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("UserId", "HotelId");
 
                     b.HasIndex("HotelId");
 
                     b.ToTable("UserForHotels");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.BookingInfo", b =>
+                {
+                    b.HasOne("HotelBooking.Models.Hotel", "Hotel")
+                        .WithMany("BillingInfos")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HotelBooking.Models.User", "User")
+                        .WithMany("BillingInfos")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.RefreshToken", b =>
@@ -143,6 +225,25 @@ namespace HotelBooking.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Reviews", b =>
+                {
+                    b.HasOne("HotelBooking.Models.Hotel", "Hotel")
+                        .WithMany("Reviews")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HotelBooking.Models.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
 
                     b.Navigation("User");
                 });
@@ -168,12 +269,20 @@ namespace HotelBooking.Migrations
 
             modelBuilder.Entity("HotelBooking.Models.Hotel", b =>
                 {
+                    b.Navigation("BillingInfos");
+
+                    b.Navigation("Reviews");
+
                     b.Navigation("UserForHotels");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.User", b =>
                 {
+                    b.Navigation("BillingInfos");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("UserForHotels");
                 });

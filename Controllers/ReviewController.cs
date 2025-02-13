@@ -12,11 +12,9 @@ namespace HotelBooking.Controllers
     public class ReviewController : ControllerBase
     {
         public readonly IReviewRepository _methods;
-        public readonly Context _context;
-        public ReviewController(IReviewRepository methods, Context context)
+        public ReviewController(IReviewRepository methods)
         {
             _methods = methods;
-            _context = context;
         }
         [HttpPost("add-review")]
         public async Task<IActionResult> PostReview(RegisterReviewDto review)

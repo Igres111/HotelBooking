@@ -11,6 +11,6 @@
         public ICollection<UserForHotel> UserForHotels { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
         public List<Reviews> Reviews { get; set; }
-        public List<BillingInfo> BillingInfos { get; set; }
+        public List<BookingInfo> BillingInfos { get; set; }
     }
 }

@@ -7,6 +7,5 @@ namespace HotelBooking.Repositories.HotelRepo
     {
         public Task RegisterHotel(RegisterHotelDto hotel);
         public Task<List<Hotel>> GetHotelsList();
-        //public Task BookHotel();
     }
 }

@@ -22,7 +22,7 @@ namespace HotelBooking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("HotelBooking.Models.BillingInfo", b =>
+            modelBuilder.Entity("HotelBooking.Models.BookingInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,6 +43,9 @@ namespace HotelBooking.Migrations
                     b.Property<bool>("PrePaid")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -52,7 +55,7 @@ namespace HotelBooking.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BillingInfos");
+                    b.ToTable("BookingInfos");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Hotel", b =>
@@ -186,9 +189,6 @@ namespace HotelBooking.Migrations
                     b.Property<Guid>("HotelId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("UserId", "HotelId");
 
                     b.HasIndex("HotelId");
@@ -196,7 +196,7 @@ namespace HotelBooking.Migrations
                     b.ToTable("UserForHotels");
                 });
 
-            modelBuilder.Entity("HotelBooking.Models.BillingInfo", b =>
+            modelBuilder.Entity("HotelBooking.Models.BookingInfo", b =>
                 {
                     b.HasOne("HotelBooking.Models.Hotel", "Hotel")
                         .WithMany("BillingInfos")
