@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace HotelBooking.Models
 {
@@ -12,8 +13,10 @@ namespace HotelBooking.Models
         public string? Comment { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         [ForeignKey(nameof(UserId))]
+        [JsonIgnore]
         public User User{ get; set; }
         [ForeignKey(nameof(HotelId))]
+        [JsonIgnore]
         public Hotel Hotel { get; set; }
     }
 }
