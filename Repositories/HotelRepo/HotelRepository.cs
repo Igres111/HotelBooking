@@ -43,5 +43,15 @@ namespace HotelBooking.Repositories.HotelRepo
             _mapper.Map(hotel, found);
             await _context.SaveChangesAsync();
         }
+        public async Task DeleteHotel(Guid id)
+        {
+            var found = await _context.Hotels.FirstOrDefaultAsync(x => x.Id == id);
+            if (found == null)
+            {
+                throw new Exception("Hotel not found");
+            }
+            _context.Hotels.Remove(found);
+            await _context.SaveChangesAsync();
+        }
     }
 }

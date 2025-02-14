@@ -85,5 +85,18 @@ namespace HotelBooking.Controllers
                 return BadRequest("Hotel not updated");
             }
         }
+        [HttpDelete("Hotel/{id}")]
+        public async Task<IActionResult> DeleteHotel(Guid id)
+        {
+            try
+            {
+                await _methods.DeleteHotel(id);
+                return Ok("Hotel Deleted");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Hotel not deleted");
+            }
+        }
     }
 }

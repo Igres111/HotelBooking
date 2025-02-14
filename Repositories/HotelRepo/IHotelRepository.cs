@@ -9,5 +9,6 @@ namespace HotelBooking.Repositories.HotelRepo
         public Task<List<GetHotelDto>> GetHotelsList();
         public Task<List<GetHotelDto>> GetHotelById(Guid id);
         public Task UpdateHotel(Guid id, HotelChangesDto hotel);
+        public Task DeleteHotel(Guid id);
     }
 }
