@@ -2,6 +2,7 @@
 using HotelBooking.Data;
 using HotelBooking.DTOs.HotelDtos;
 using HotelBooking.Repositories.HotelRepo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
@@ -22,6 +23,7 @@ namespace HotelBooking.Controllers
             _methods = methods;
         }
         [HttpGet]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetHotels()
         {
             if (!ModelState.IsValid)
@@ -39,6 +41,7 @@ namespace HotelBooking.Controllers
             }
         }
         [HttpPost("Register-Hotel")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Register(RegisterHotelDto hotel)
         {
             if (!ModelState.IsValid)
@@ -68,7 +71,8 @@ namespace HotelBooking.Controllers
               return NotFound("Hotel not found");
             }
         }
-        [HttpPut("Hotel/{id}")]
+        [HttpPut("{id}")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> UpdateHotel(Guid id, HotelChangesDto hotel)
         {
             if (!ModelState.IsValid)
@@ -85,7 +89,7 @@ namespace HotelBooking.Controllers
                 return BadRequest("Hotel not updated");
             }
         }
-        [HttpDelete("Hotel/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHotel(Guid id)
         {
             try
