@@ -57,5 +57,15 @@ namespace HotelBooking.Repositories.ReviewRepo
                 }).ToListAsync();
             return result;
         }
+        public async Task DeleteReview(Guid reviewId)
+        {
+            var found = await _context.Reviews.FirstOrDefaultAsync(x => x.Id == reviewId);
+            if (found == null)
+            {
+                throw new Exception("Review not found");
+            }
+            _context.Reviews.Remove(found);
+            await _context.SaveChangesAsync();
+        } 
     }
 }

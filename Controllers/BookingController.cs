@@ -21,8 +21,15 @@ namespace HotelBooking.Controllers
             {
                 return BadRequest(ModelState);
             }
-           var result = await _methods.BookHotel(info);
-            return Ok(result);
+            try
+            {
+                var result = await _methods.BookHotel(info);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Booking not successful");
+            }
         }
         [HttpGet("Bookings/{id}")]
         public async Task<IActionResult> GetBookingById(Guid id)

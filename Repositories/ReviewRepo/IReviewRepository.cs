@@ -7,5 +7,6 @@ namespace HotelBooking.Repositories.ReviewRepo
     {
         public Task RegisterReview(RegisterReviewDto review);
         public Task<List<ReturnReviewDto>> GetReviewsById(Guid hotelId);
+        public Task DeleteReview(Guid reviewId);
     }
 }
