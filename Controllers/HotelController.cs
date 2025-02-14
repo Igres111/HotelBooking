@@ -4,6 +4,7 @@ using HotelBooking.DTOs.HotelDtos;
 using HotelBooking.Repositories.HotelRepo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace HotelBooking.Controllers
 {
@@ -27,8 +28,15 @@ namespace HotelBooking.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var result =await _methods.GetHotelsList();
-            return Ok("Hotels List");
+            try
+            {
+                var result = await _methods.GetHotelsList();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return NotFound("Hotels Not Found");
+            }
         }
         [HttpPost("Register-Hotel")]
         public async Task<IActionResult> Register(RegisterHotelDto hotel)
@@ -37,8 +45,45 @@ namespace HotelBooking.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await _methods.RegisterHotel(hotel);
-            return Ok("Registered Succesfully");
+            try
+            {
+                await _methods.RegisterHotel(hotel);
+                return Ok("Registered Succesfully");
+            }
+            catch (Exception)
+            {
+                return  BadRequest("Hotel not registered");
+            }         
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetHotelWithId(Guid id)
+        {
+            try
+            {
+                var result = await _methods.GetHotelById(id);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+              return NotFound("Hotel not found");
+            }
+        }
+        [HttpPut("Hotel/{id}")]
+        public async Task<IActionResult> UpdateHotel(Guid id, HotelChangesDto hotel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                await _methods.UpdateHotel(id, hotel);
+                return Ok("Hotel Updated");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Hotel not updated");
+            }
         }
     }
 }

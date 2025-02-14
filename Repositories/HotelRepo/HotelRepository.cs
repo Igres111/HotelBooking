@@ -23,10 +23,25 @@ namespace HotelBooking.Repositories.HotelRepo
             await _context.Hotels.AddAsync(newHotel);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<Hotel>> GetHotelsList()
+        public async Task<List<GetHotelDto>> GetHotelsList()
         {
             var hotels = await _context.Hotels.ToListAsync();
-            return _mapper.Map<List<Hotel>>(hotels);
+            return _mapper.Map<List<GetHotelDto>>(hotels);
+        }
+        public async Task<List<GetHotelDto>> GetHotelById(Guid id)
+        {
+            var hotel = await _context.Hotels.Where(x => x.Id == id).ToListAsync();
+            return _mapper.Map<List<GetHotelDto>>(hotel);
+        }
+        public async Task UpdateHotel(Guid id, HotelChangesDto hotel)
+        {
+            var found = await _context.Hotels.FirstOrDefaultAsync(x => x.Id == id);
+            if (found == null)
+            {
+                throw new Exception("Hotel not found");
+            }
+            _mapper.Map(hotel, found);
+            await _context.SaveChangesAsync();
         }
     }
 }
