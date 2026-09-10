@@ -39,12 +39,12 @@ namespace HotelBooking.Controllers
         /// <response code="201">User registered successfully.</response>
         /// <response code="400">Validation failed.</response>
         /// <response code="409">A user with this email already exists.</response>
-        [HttpPost]
+        [HttpPost("signup")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Register(RegisterUserRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
         {
             var response = await _authService.Register(request, cancellationToken);
 
@@ -71,7 +71,7 @@ namespace HotelBooking.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseWrapper), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseWrapper<User>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login(LoginUserRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
         {
             var response = await _authService.Login(request, cancellationToken);
 

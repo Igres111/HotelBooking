@@ -57,15 +57,24 @@ namespace HotelBooking.Services
 
             var user = await userRepository.GetByEmail(email, cancellationToken);
 
-            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user?.PasswordHash);
-
-            if (!isPasswordValid || user is null)
+            if (user is null)
             {
                 return new ResponseWrapper<User>(
                     false,
                     (int)HttpStatusCode.Unauthorized,
                     "Invalid email or password.",
-                    null);
+                    default);
+            }
+
+            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user?.PasswordHash);
+
+            if (!isPasswordValid)
+            {
+                return new ResponseWrapper<User>(
+                    false,
+                    (int)HttpStatusCode.Unauthorized,
+                    "Invalid email or password.",
+                    default);
             }
 
             return new ResponseWrapper<User>(

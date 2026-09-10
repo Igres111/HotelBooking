@@ -3,6 +3,7 @@ using System.Security.Authentication;
 using System.Text.Json;
 using FluentValidation;
 using HotelBooking.Models.Responses;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Middleware
@@ -91,6 +92,7 @@ namespace HotelBooking.Middleware
             UnauthorizedAccessException => HttpStatusCode.Forbidden,
             ConflictException => HttpStatusCode.Conflict,
             DbUpdateConcurrencyException => HttpStatusCode.Conflict,
+            DbUpdateException dbUpdateException when IsUniqueConstraintViolation(dbUpdateException) => HttpStatusCode.Conflict,
             _ => HttpStatusCode.InternalServerError
         };
 
@@ -111,9 +113,16 @@ namespace HotelBooking.Middleware
 
             DbUpdateConcurrencyException => "The record was modified by another operation.",
 
+            DbUpdateException dbUpdateException when IsUniqueConstraintViolation(dbUpdateException) =>
+                "A record with the same value already exists.",
+
             DbUpdateException => "A database error occurred.",
 
             _ => "An unexpected error occurred."
         };
+
+        private static bool IsUniqueConstraintViolation(DbUpdateException exception) =>
+            exception.InnerException is SqlException sqlException &&
+            (sqlException.Number == 2601 || sqlException.Number == 2627);
     }
 }

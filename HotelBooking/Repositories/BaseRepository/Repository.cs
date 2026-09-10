@@ -16,6 +16,11 @@ namespace HotelBooking.Repositories.BaseRepository
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<List<T>> GetAllForAdminAsync(CancellationToken cancellationToken)
+        {
+            return await Context.Set<T>().ToListAsync(cancellationToken);
+        }
+
         public async Task AddAsync(T entity, CancellationToken cancellationToken)
         {
             await Context.Set<T>().AddAsync(entity, cancellationToken);
