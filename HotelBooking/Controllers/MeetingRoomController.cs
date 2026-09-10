@@ -51,19 +51,25 @@ namespace HotelBooking.Controllers
         }
 
         /// <summary>
-        /// Retrieves every active meeting room.
+        /// Retrieves active meeting rooms, with search, filtering, sorting, and pagination.
         /// </summary>
         /// <remarks>
         /// Employee or Administrator role required. Deactivated rooms are excluded - use
         /// GET /api/meetingroom/admin for the unfiltered admin view.
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/meetingroom?name=conference&amp;location=Tbilisi&amp;minCapacity=5&amp;sortBy=capacity&amp;sortDescending=true&amp;page=1&amp;pageSize=20
+        ///
+        /// sortBy accepts "name", "location", or "capacity" (defaults to "name").
         /// </remarks>
         /// <response code="200">Meeting rooms retrieved successfully.</response>
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(ResponseWrapper<List<MeetingRoomsResponse>>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllActive(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(ResponseWrapper<PagedResult<MeetingRoomsResponse>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllActive([FromQuery] GetMeetingRoomsRequest request, CancellationToken cancellationToken)
         {
-            var response = await _meetingRoomService.GetAllActive(cancellationToken);
+            var response = await _meetingRoomService.GetAllActive(request, cancellationToken);
 
             return StatusCode(response.StatusCode, response);
         }

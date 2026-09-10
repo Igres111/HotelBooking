@@ -33,12 +33,17 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IIdempotencyRecordRepository, IdempotencyRecordRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddSingleton<ITimeZoneConverter, TimeZoneConverter>();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
 builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateMeetingRoomRequest>, CreateMeetingRoomRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateMeetingRoomRequest>, UpdateMeetingRoomRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

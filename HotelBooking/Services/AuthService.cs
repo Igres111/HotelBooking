@@ -49,7 +49,7 @@ namespace HotelBooking.Services
                 user.Id);
         }
 
-        public async Task<ResponseWrapper<User>> Login(LoginUserRequest request, CancellationToken cancellationToken)
+        public async Task<ResponseWrapper<UserResponse>> Login(LoginUserRequest request, CancellationToken cancellationToken)
         {
             await loginUserRequestValidator.ValidateAndThrowAsync(request, cancellationToken);
 
@@ -59,29 +59,29 @@ namespace HotelBooking.Services
 
             if (user is null)
             {
-                return new ResponseWrapper<User>(
+                return new ResponseWrapper<UserResponse>(
                     false,
                     (int)HttpStatusCode.Unauthorized,
                     "Invalid email or password.",
                     default);
             }
 
-            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user?.PasswordHash);
+            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
             if (!isPasswordValid)
             {
-                return new ResponseWrapper<User>(
+                return new ResponseWrapper<UserResponse>(
                     false,
                     (int)HttpStatusCode.Unauthorized,
                     "Invalid email or password.",
                     default);
             }
 
-            return new ResponseWrapper<User>(
+            return new ResponseWrapper<UserResponse>(
                 true,
                 (int)HttpStatusCode.OK,
-                "Login successful.", 
-                user);
+                "Login successful.",
+                new UserResponse(user.Id, user.Email, user.Role));
         }
     }
 }

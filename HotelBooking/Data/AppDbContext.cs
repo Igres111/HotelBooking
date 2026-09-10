@@ -1,3 +1,4 @@
+using HotelBooking.Constants;
 using HotelBooking.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,8 +84,13 @@ namespace HotelBooking.Data
 
             builder.Entity<IdempotencyRecord>(idempotency =>
             {
-                idempotency.Property(i => i.Key).IsRequired().HasMaxLength(100);
-                idempotency.HasIndex(i => i.Key).IsUnique();
+                idempotency.Property(i => i.Key).IsRequired().HasMaxLength(ValidatorConstants.StringLengths.IdempotencyKeyMaxLength);
+                idempotency.HasIndex(i => new { i.UserId, i.Key }).IsUnique();
+
+                idempotency.HasOne(i => i.User)
+                    .WithMany()
+                    .HasForeignKey(i => i.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

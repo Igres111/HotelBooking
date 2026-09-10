@@ -1,4 +1,5 @@
 using FluentValidation;
+using HotelBooking.Constants;
 using HotelBooking.Models.Requests;
 
 namespace HotelBooking.Validators
@@ -9,20 +10,24 @@ namespace HotelBooking.Validators
         {
             RuleFor(request => request.Name)
                 .NotEmpty().WithMessage("Name cannot be empty.")
-                .MaximumLength(200).WithMessage("Name must not exceed 200 characters.")
+                .MaximumLength(ValidatorConstants.StringLengths.RoomNameMaxLength)
+                    .WithMessage($"Name must not exceed {ValidatorConstants.StringLengths.RoomNameMaxLength} characters.")
                 .When(request => request.Name is not null);
 
             RuleFor(request => request.Location)
                 .NotEmpty().WithMessage("Location cannot be empty.")
-                .MaximumLength(200).WithMessage("Location must not exceed 200 characters.")
+                .MaximumLength(ValidatorConstants.StringLengths.LocationMaxLength)
+                    .WithMessage($"Location must not exceed {ValidatorConstants.StringLengths.LocationMaxLength} characters.")
                 .When(request => request.Location is not null);
 
             RuleFor(request => request.Description)
-                .MaximumLength(1000).WithMessage("Description must not exceed 1000 characters.")
+                .MaximumLength(ValidatorConstants.StringLengths.DescriptionMaxLength)
+                    .WithMessage($"Description must not exceed {ValidatorConstants.StringLengths.DescriptionMaxLength} characters.")
                 .When(request => request.Description is not null);
 
             RuleFor(request => request.Capacity)
-                .GreaterThan(0).WithMessage("Capacity must be greater than zero.")
+                .GreaterThan(ValidatorConstants.Numbers.MinimumPositiveValue)
+                    .WithMessage("Capacity must be greater than zero.")
                 .When(request => request.Capacity is not null);
 
             RuleFor(request => request)

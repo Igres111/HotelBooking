@@ -1,4 +1,3 @@
-using HotelBooking.Models.Entities;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
 using HotelBooking.Services.Interfaces;
@@ -63,14 +62,15 @@ namespace HotelBooking.Controllers
         ///         "password": "Passw0rd!"
         ///     }
         ///
-        /// On success, an authentication cookie is issued - the response body carries no user data.
+        /// On success, an authentication cookie is issued and the response body carries the
+        /// authenticated user's id, email, and role.
         /// </remarks>
         /// <response code="200">Login successful.</response>
         /// <response code="401">Email or password is invalid.</response>
         [HttpPost("login")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ResponseWrapper), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ResponseWrapper<User>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ResponseWrapper<UserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseWrapper<UserResponse>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
         {
             var response = await _authService.Login(request, cancellationToken);
@@ -80,12 +80,7 @@ namespace HotelBooking.Controllers
                 return StatusCode(response.StatusCode, response);
             }
 
-            if (response.Data is null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Login succeeded but no user data was returned.");
-            }
-
-            var user = response.Data;
+            var user = response.Data!;
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -96,10 +91,7 @@ namespace HotelBooking.Controllers
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-            return StatusCode(response.StatusCode, new ResponseWrapper(
-                true,
-                response.StatusCode,
-                response.Message));
+            return StatusCode(response.StatusCode, response);
         }
 
         /// <summary>

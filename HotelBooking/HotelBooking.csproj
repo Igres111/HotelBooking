@@ -26,6 +26,8 @@
     <Folder Include="Models\BaseTypes\" />
     <Folder Include="Models\Enums\" />
     <Folder Include="Models\Requests\" />
+    <Folder Include="Constants\" />
+    <Folder Include="Helpers\" />
     <Folder Include="Validators\" />
     <Folder Include="Services\" />
     <Folder Include="Repositories\BaseRepository\" />

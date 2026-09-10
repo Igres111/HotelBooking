@@ -1,5 +1,6 @@
 using System.Net;
 using FluentValidation;
+using HotelBooking.Constants;
 using HotelBooking.Models.Entities;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
@@ -49,7 +50,7 @@ namespace HotelBooking.Services
 
         public async Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllForAdmin(CancellationToken cancellationToken)
         {
-            var rooms = await roomRepository.GetAllForAdminAsync(cancellationToken);
+            var rooms = await roomRepository.GetAllAsync(cancellationToken);
 
             var response = rooms
                 .Select(room => new MeetingRoomsResponse(
@@ -70,11 +71,25 @@ namespace HotelBooking.Services
                 response);
         }
 
-        public async Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllActive(CancellationToken cancellationToken)
+        public async Task<ResponseWrapper<PagedResult<MeetingRoomsResponse>>> GetAllActive(GetMeetingRoomsRequest request, CancellationToken cancellationToken)
         {
-            var rooms = await roomRepository.GetAllActiveRooms(cancellationToken);
+            var page = Math.Max(request.Page, 1);
 
-            var response = rooms
+            int NormalizePageSize(int pageSize) => pageSize >= 1 && pageSize <= PaginationConstants.MaxPageSize ? pageSize : PaginationConstants.DefaultPageSize;
+
+            var pageSize = NormalizePageSize(request.PageSize);
+
+            var pagedRooms = await roomRepository.GetActiveRoomsPaged(
+                name: request.Name,
+                location: request.Location,
+                minCapacity: request.MinCapacity,
+                sortBy: request.SortBy,
+                sortDescending: request.SortDescending,
+                page: page,
+                pageSize: pageSize,
+                cancellationToken: cancellationToken);
+
+            var items = pagedRooms.Items
                 .Select(room => new MeetingRoomsResponse(
                     room.Id,
                     room.Name,
@@ -86,7 +101,9 @@ namespace HotelBooking.Services
                     room.IsActive))
                 .ToList();
 
-            return new ResponseWrapper<List<MeetingRoomsResponse>>(
+            var response = new PagedResult<MeetingRoomsResponse>(items, pagedRooms.TotalCount, page, pageSize);
+
+            return new ResponseWrapper<PagedResult<MeetingRoomsResponse>>(
                 true,
                 (int)HttpStatusCode.OK,
                 "Meeting rooms retrieved successfully.",
