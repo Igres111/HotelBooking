@@ -35,7 +35,6 @@ namespace HotelBooking.Data
             builder.Entity<Booking>(booking =>
             {
                 booking.Property(b => b.Notes).HasMaxLength(500);
-                booking.Property(b => b.IdempotencyKey).HasMaxLength(100);
                 booking.HasIndex(b => new { b.RoomId, b.StartUtc, b.EndUtc });
 
                 booking.HasOne(b => b.Room)

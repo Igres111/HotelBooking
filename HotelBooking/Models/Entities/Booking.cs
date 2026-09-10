@@ -25,11 +25,9 @@ namespace HotelBooking.Models.Entities
         public int? RecurringSeriesId { get; set; }
         public RecurringBookingSeries? RecurringSeries { get; set; }
 
-        public string? IdempotencyKey { get; set; }
-
         [Timestamp]
         public byte[]? RowVersion { get; set; }
 
-        public List<BookingStatusHistory> StatusHistory { get; set; } = [];
+        public ICollection<BookingStatusHistory> StatusHistory { get; set; } = [];
     }
 }

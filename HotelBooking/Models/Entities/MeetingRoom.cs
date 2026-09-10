@@ -13,6 +13,6 @@ namespace HotelBooking.Models.Entities
         public TimeOnly ClosingTime { get; set; }
         public bool IsActive { get; set; } = true;
 
-        public List<Booking> Bookings { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }

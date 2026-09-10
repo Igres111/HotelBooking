@@ -11,6 +11,6 @@ namespace HotelBooking.Models.Entities
         public User? User { get; set; }
         public int OccurrenceCount { get; set; }
 
-        public List<Booking> Bookings { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }
