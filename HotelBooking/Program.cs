@@ -1,16 +1,15 @@
 using DotNetEnv;
+using FluentValidation;
 using HotelBooking.Data;
 using HotelBooking.Middleware;
+using HotelBooking.Models.Requests;
 using HotelBooking.Repositories;
 using HotelBooking.Repositories.BaseRepository;
 using HotelBooking.Repositories.Interfaces;
 using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using HotelBooking.Validators;
-using FluentValidation;
-using HotelBooking.Models.Requests;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -78,6 +77,18 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("X-Frame-Options", "DENY");
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
 
 app.UseSerilogRequestLogging();
 

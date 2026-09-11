@@ -144,6 +144,52 @@ namespace HotelBooking.Controllers
         }
 
         /// <summary>
+        /// Retrieves a single booking by id.
+        /// </summary>
+        /// <remarks>
+        /// Any authenticated user may call this - an Employee may only view their own booking,
+        /// while an Administrator may view any booking.
+        /// </remarks>
+        /// <response code="200">Booking retrieved successfully.</response>
+        /// <response code="403">You do not have permission to view this booking.</response>
+        /// <response code="404">Booking not found.</response>
+        [HttpGet("{id}")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var isAdmin = User.IsInRole("Administrator");
+
+            var response = await _bookingService.GetById(id, userId, isAdmin, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Retrieves the full status-change history of a booking.
+        /// </summary>
+        /// <remarks>
+        /// Administrator role required. Entries are ordered chronologically and include the previous
+        /// status, the new status, the acting user, the timestamp, and the optional reason recorded
+        /// on rejection or cancellation.
+        /// </remarks>
+        /// <response code="200">Booking history retrieved successfully.</response>
+        /// <response code="404">Booking not found.</response>
+        [HttpGet("{id}/history")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(typeof(ResponseWrapper<List<BookingStatusHistoryResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseWrapper<List<BookingStatusHistoryResponse>>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetHistory([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var response = await _bookingService.GetHistory(id, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
         /// Retrieves every booking, across all users and rooms.
         /// </summary>
         /// <remarks>

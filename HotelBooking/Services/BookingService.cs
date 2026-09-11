@@ -365,6 +365,81 @@ namespace HotelBooking.Services
                 response);
         }
 
+        public async Task<ResponseWrapper<BookingResponse>> GetById(int bookingId, int actingUserId, bool isAdmin, CancellationToken cancellationToken)
+        {
+            var booking = await bookingRepository.GetByIdWithDetails(bookingId, cancellationToken);
+
+            if (booking is null)
+            {
+                return new ResponseWrapper<BookingResponse>(
+                    false,
+                    (int)HttpStatusCode.NotFound,
+                    "Booking not found.",
+                    default);
+            }
+
+            if (!isAdmin && booking.UserId != actingUserId)
+            {
+                return new ResponseWrapper<BookingResponse>(
+                    false,
+                    (int)HttpStatusCode.Forbidden,
+                    "You do not have permission to view this booking.",
+                    default);
+            }
+
+            var response = new BookingResponse(
+                booking.Id,
+                booking.RoomId,
+                booking.Room!.Name,
+                booking.UserId,
+                booking.User!.FullName,
+                booking.StartUtc,
+                booking.EndUtc,
+                booking.AttendeeCount,
+                booking.Notes,
+                booking.Status,
+                booking.RecurringSeriesId);
+
+            return new ResponseWrapper<BookingResponse>(
+                true,
+                (int)HttpStatusCode.OK,
+                "Booking retrieved successfully.",
+                response);
+        }
+
+        public async Task<ResponseWrapper<List<BookingStatusHistoryResponse>>> GetHistory(int bookingId, CancellationToken cancellationToken)
+        {
+            var booking = await bookingRepository.GetByIdWithDetails(bookingId, cancellationToken);
+
+            if (booking is null)
+            {
+                return new ResponseWrapper<List<BookingStatusHistoryResponse>>(
+                    false,
+                    (int)HttpStatusCode.NotFound,
+                    "Booking not found.",
+                    default);
+            }
+
+            var history = await bookingRepository.GetStatusHistory(bookingId, cancellationToken);
+
+            var response = history
+                .Select(entry => new BookingStatusHistoryResponse(
+                    entry.Id,
+                    entry.PreviousStatus,
+                    entry.NewStatus,
+                    entry.ActingUserId,
+                    entry.ActingUser!.FullName,
+                    entry.Reason,
+                    entry.CreatedAt))
+                .ToList();
+
+            return new ResponseWrapper<List<BookingStatusHistoryResponse>>(
+                true,
+                (int)HttpStatusCode.OK,
+                "Booking history retrieved successfully.",
+                response);
+        }
+
         public async Task<ResponseWrapper<BookingResponse>> Confirm(int bookingId, int adminUserId, CancellationToken cancellationToken)
         {
             var outcome = await bookingRepository.TryConfirm(bookingId, adminUserId, cancellationToken);

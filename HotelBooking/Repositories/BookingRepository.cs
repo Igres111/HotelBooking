@@ -48,6 +48,25 @@ namespace HotelBooking.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public Task<Booking?> GetByIdWithDetails(int id, CancellationToken cancellationToken)
+        {
+            return Context.Bookings
+                .AsNoTracking()
+                .Include(booking => booking.Room)
+                .Include(booking => booking.User)
+                .FirstOrDefaultAsync(booking => booking.Id == id && booking.DeletedAt == null, cancellationToken);
+        }
+
+        public Task<List<BookingStatusHistory>> GetStatusHistory(int bookingId, CancellationToken cancellationToken)
+        {
+            return Context.BookingStatusHistories
+                .AsNoTracking()
+                .Include(history => history.ActingUser)
+                .Where(history => history.BookingId == bookingId)
+                .OrderBy(history => history.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
             int? roomId,
