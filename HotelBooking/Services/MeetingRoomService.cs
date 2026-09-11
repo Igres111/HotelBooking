@@ -11,8 +11,11 @@ namespace HotelBooking.Services
 {
     public class MeetingRoomService(
         IMeetingRoomRepository roomRepository,
+        IBookingRepository bookingRepository,
         IValidator<CreateMeetingRoomRequest> createMeetingRoomRequestValidator,
-        IValidator<UpdateMeetingRoomRequest> updateMeetingRoomRequestValidator) : IMeetingRoomService
+        IValidator<UpdateMeetingRoomRequest> updateMeetingRoomRequestValidator,
+        IValidator<GetRoomAvailabilityRequest> getRoomAvailabilityRequestValidator,
+        ITimeZoneConverter timeZoneConverter) : IMeetingRoomService
     {
         public async Task<ResponseWrapper<int>> Create(CreateMeetingRoomRequest request, CancellationToken cancellationToken)
         {
@@ -236,6 +239,58 @@ namespace HotelBooking.Services
                 (int)HttpStatusCode.OK,
                 "Meeting room updated successfully.",
                 response);
+        }
+
+        public async Task<ResponseWrapper<List<TimeSlotResponse>>> GetAvailability(int roomId, GetRoomAvailabilityRequest request, CancellationToken cancellationToken)
+        {
+            await getRoomAvailabilityRequestValidator.ValidateAndThrowAsync(request, cancellationToken);
+
+            var room = await roomRepository.GetActiveById(roomId, cancellationToken);
+            if (room is null)
+            {
+                return new ResponseWrapper<List<TimeSlotResponse>>(
+                    false,
+                    (int)HttpStatusCode.NotFound,
+                    "Meeting room not found or is not active.",
+                    default);
+            }
+
+            var duration = TimeSpan.FromMinutes(request.DurationMinutes);
+            var slotInterval = TimeSpan.FromMinutes(ValidatorConstants.Numbers.BookingMinimumDurationMinutes);
+            var openingSpan = room.OpeningTime.ToTimeSpan();
+            var closingSpan = room.ClosingTime.ToTimeSpan();
+
+            var windowStartUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(room.OpeningTime), request.TimeZoneId);
+            var windowEndUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(room.ClosingTime), request.TimeZoneId);
+
+            var confirmedBookings = await bookingRepository.GetConfirmedBookingsInRange(roomId, windowStartUtc, windowEndUtc, cancellationToken);
+
+            var availableSlots = new List<TimeSlotResponse>();
+            var lastCandidateStartSpan = closingSpan - duration;
+
+            for (var currentStart = openingSpan; currentStart <= lastCandidateStartSpan; currentStart += slotInterval)
+            {
+                var candidateStart = TimeOnly.FromTimeSpan(currentStart);
+                var candidateEnd = TimeOnly.FromTimeSpan(currentStart + duration);
+
+                var candidateStartUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(candidateStart), request.TimeZoneId);
+                var candidateEndUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(candidateEnd), request.TimeZoneId);
+
+                var hasOverlap = confirmedBookings.Any(booking =>
+                    booking.StartUtc < candidateEndUtc &&
+                    candidateStartUtc < booking.EndUtc);
+
+                if (!hasOverlap)
+                {
+                    availableSlots.Add(new TimeSlotResponse(candidateStart, candidateEnd));
+                }
+            }
+
+            return new ResponseWrapper<List<TimeSlotResponse>>(
+                true,
+                (int)HttpStatusCode.OK,
+                "Availability retrieved successfully.",
+                availableSlots);
         }
     }
 }

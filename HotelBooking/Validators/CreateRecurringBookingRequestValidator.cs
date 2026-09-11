@@ -2,13 +2,12 @@ using FluentValidation;
 using HotelBooking.Constants;
 using HotelBooking.Helpers;
 using HotelBooking.Models.Requests;
-using HotelBooking.Services.Interfaces;
 
 namespace HotelBooking.Validators
 {
-    public class CreateBookingRequestValidator : AbstractValidator<CreateBookingRequest>
+    public class CreateRecurringBookingRequestValidator : AbstractValidator<CreateRecurringBookingRequest>
     {
-        public CreateBookingRequestValidator(ITimeZoneConverter timeZoneConverter)
+        public CreateRecurringBookingRequestValidator()
         {
             RuleFor(request => request.RoomId)
                 .GreaterThan(ValidatorConstants.Numbers.MinimumPositiveValue)
@@ -26,6 +25,10 @@ namespace HotelBooking.Validators
                 .Must(BookingValidationHelper.IsValidTimeZone)
                 .WithMessage("Timezone must be a valid IANA timezone identifier.");
 
+            RuleFor(request => request.OccurrenceCount)
+                .InclusiveBetween(ValidatorConstants.Numbers.MinimumRecurringOccurrences, ValidatorConstants.Numbers.MaximumRecurringOccurrences)
+                .WithMessage($"Occurrence count must be between {ValidatorConstants.Numbers.MinimumRecurringOccurrences} and {ValidatorConstants.Numbers.MaximumRecurringOccurrences}.");
+
             RuleFor(request => request)
                 .Must(request => request.EndTime > request.StartTime)
                 .WithName("EndTime")
@@ -42,18 +45,6 @@ namespace HotelBooking.Validators
                 .WithName("EndTime")
                 .WithMessage("Duration must be in 30-minute increments.")
                 .When(request => request.EndTime > request.StartTime);
-
-            RuleFor(request => request)
-                .Must(request => BookingValidationHelper.IsInTheFuture(request.Date, request.StartTime, request.TimeZoneId, timeZoneConverter))
-                .WithName("StartTime")
-                .WithMessage("Start time must be in the future.")
-                .When(request => BookingValidationHelper.IsValidTimeZone(request.TimeZoneId));
-
-            RuleFor(request => request)
-                .Must(request => BookingValidationHelper.IsWithinAdvanceBookingWindow(request.Date, request.TimeZoneId, timeZoneConverter))
-                .WithName("Date")
-                .WithMessage($"Bookings cannot be more than {ValidatorConstants.Numbers.MaximumAdvanceBookingDays} days in advance.")
-                .When(request => BookingValidationHelper.IsValidTimeZone(request.TimeZoneId));
         }
     }
 }

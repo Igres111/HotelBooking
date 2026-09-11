@@ -13,6 +13,7 @@ namespace HotelBooking.Constants
             public const int DescriptionMaxLength = 1000;
             public const int NotesMaxLength = 500;
             public const int IdempotencyKeyMaxLength = 100;
+            public const int ReasonMaxLength = 500;
         }
 
         public static class Numbers
@@ -21,6 +22,9 @@ namespace HotelBooking.Constants
             public const int BookingMinimumDurationMinutes = 30;
             public const int BookingMaximumDurationHours = 4;
             public const int MaximumAdvanceBookingDays = 30;
+            public const int MinimumRecurringOccurrences = 1;
+            public const int MaximumRecurringOccurrences = 4;
+            public const int RecurringOccurrenceIntervalDays = 7;
 
             public static readonly TimeSpan BookingMinimumDuration = TimeSpan.FromMinutes(BookingMinimumDurationMinutes);
             public static readonly TimeSpan BookingMaximumDuration = TimeSpan.FromHours(BookingMaximumDurationHours);

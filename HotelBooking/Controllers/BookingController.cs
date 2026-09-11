@@ -39,13 +39,13 @@ namespace HotelBooking.Controllers
         /// startTime/endTime are local to timeZoneId - the server converts them to UTC for storage.
         /// The booking is created with Pending status.
         ///
-        /// The optional Idempotency-Key header makes retries safe: repeating the same request with the
-        /// same key returns the original result instead of creating a duplicate booking, reusing the
-        /// key with different booking data is rejected with 409, and concurrent requests carrying the
-        /// same key are handled safely - only one can ever create a booking.
+        /// The Idempotency-Key header is required and makes retries safe: repeating the same request
+        /// with the same key returns the original result instead of creating a duplicate booking,
+        /// reusing the key with different booking data is rejected with 409, and concurrent requests
+        /// carrying the same key are handled safely - only one can ever create a booking.
         /// </remarks>
         /// <response code="201">Booking created successfully.</response>
-        /// <response code="400">Validation failed.</response>
+        /// <response code="400">Validation failed, or the Idempotency-Key header is missing.</response>
         /// <response code="404">Meeting room not found or is not active.</response>
         /// <response code="409">This room is already booked for the requested time slot, or the idempotency key was reused with different data.</response>
         [HttpPost]
@@ -62,6 +62,59 @@ namespace HotelBooking.Controllers
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var response = await _bookingService.Create(request, userId, idempotencyKey, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Creates a weekly recurring booking, atomically.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /api/booking/recurring
+        ///     Idempotency-Key: 3f29c1e2-5e3a-4b7a-9c2d-8a1e6f0b2b31
+        ///     {
+        ///         "roomId": 1,
+        ///         "startDate": "2026-09-15",
+        ///         "startTime": "10:00",
+        ///         "endTime": "11:00",
+        ///         "attendeeCount": 5,
+        ///         "notes": "Weekly sync",
+        ///         "timeZoneId": "Asia/Tbilisi",
+        ///         "occurrenceCount": 4
+        ///     }
+        ///
+        /// Occurrences repeat weekly starting from startDate, up to 4 total. Every occurrence is
+        /// validated independently (future date, business hours, capacity, 30-day advance window,
+        /// overlap with a confirmed booking) - if any single occurrence fails, none are created.
+        /// All resulting bookings share the same recurring series and start as Pending; an
+        /// administrator confirms or rejects each occurrence individually via the normal
+        /// confirm/reject endpoints.
+        ///
+        /// The Idempotency-Key header is required and works the same way as on single booking
+        /// creation: repeating the same request with the same key returns the original result
+        /// instead of creating duplicate bookings, reusing the key with different data is rejected
+        /// with 409, and concurrent requests carrying the same key are handled safely.
+        /// </remarks>
+        /// <response code="201">Recurring booking created successfully.</response>
+        /// <response code="400">Validation failed, or the Idempotency-Key header is missing.</response>
+        /// <response code="404">Meeting room not found or is not active.</response>
+        /// <response code="409">One of the occurrences is already booked for the requested time slot, or the idempotency key was reused with different data.</response>
+        [HttpPost("recurring")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseWrapper<List<int>>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseWrapper<List<int>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseWrapper<List<int>>), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> CreateRecurring(
+            [FromBody] CreateRecurringBookingRequest request,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
+            CancellationToken cancellationToken)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var response = await _bookingService.CreateRecurring(request, userId, idempotencyKey, cancellationToken);
 
             return StatusCode(response.StatusCode, response);
         }
@@ -103,6 +156,101 @@ namespace HotelBooking.Controllers
         public async Task<IActionResult> GetAllForAdmin(CancellationToken cancellationToken)
         {
             var response = await _bookingService.GetAllForAdmin(cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Confirms a pending booking.
+        /// </summary>
+        /// <remarks>
+        /// Administrator role required. Availability is re-checked at confirmation time under a
+        /// database-level lock, so two administrators confirming overlapping bookings at the same
+        /// time can never both succeed - the loser gets a 409.
+        /// </remarks>
+        /// <response code="200">Booking confirmed successfully.</response>
+        /// <response code="404">Booking not found.</response>
+        /// <response code="409">The booking is not pending, or the room is already booked for that time slot.</response>
+        [HttpPost("{id}/confirm")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Confirm([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var adminUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var response = await _bookingService.Confirm(id, adminUserId, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Rejects a pending booking.
+        /// </summary>
+        /// <remarks>
+        /// Administrator role required. The request body is optional; an optional reason may be
+        /// supplied and is recorded in the booking's status history.
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/booking/1/reject
+        ///     {
+        ///         "reason": "Room needed for maintenance"
+        ///     }
+        /// </remarks>
+        /// <response code="200">Booking rejected successfully.</response>
+        /// <response code="400">Reason exceeds the maximum length.</response>
+        /// <response code="404">Booking not found.</response>
+        /// <response code="409">Only a pending booking can be rejected.</response>
+        [HttpPost("{id}/reject")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Reject([FromRoute] int id, [FromBody] BookingReasonRequest? request, CancellationToken cancellationToken)
+        {
+            var adminUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var response = await _bookingService.Reject(id, adminUserId, request, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Cancels a pending or confirmed booking.
+        /// </summary>
+        /// <remarks>
+        /// Any authenticated user may call this - an Employee may only cancel their own booking,
+        /// while an Administrator may cancel any booking. The request body is optional; an optional
+        /// reason may be supplied and is recorded in the booking's status history.
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/booking/1/cancel
+        ///     {
+        ///         "reason": "Meeting no longer needed"
+        ///     }
+        /// </remarks>
+        /// <response code="200">Booking cancelled successfully.</response>
+        /// <response code="400">Reason exceeds the maximum length.</response>
+        /// <response code="403">You do not have permission to cancel this booking.</response>
+        /// <response code="404">Booking not found.</response>
+        /// <response code="409">Only a pending or confirmed booking can be cancelled.</response>
+        [HttpPost("{id}/cancel")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Cancel([FromRoute] int id, [FromBody] BookingReasonRequest? request, CancellationToken cancellationToken)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var isAdmin = User.IsInRole("Administrator");
+
+            var response = await _bookingService.Cancel(id, userId, isAdmin, request, cancellationToken);
 
             return StatusCode(response.StatusCode, response);
         }

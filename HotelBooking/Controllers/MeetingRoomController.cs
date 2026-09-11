@@ -91,6 +91,36 @@ namespace HotelBooking.Controllers
         }
 
         /// <summary>
+        /// Retrieves the available time slots for a room on a given date, for a requested duration.
+        /// </summary>
+        /// <remarks>
+        /// Employee or Administrator role required.
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/meetingroom/1/availability?date=2026-09-20&amp;durationMinutes=60&amp;timeZoneId=Asia/Tbilisi
+        ///
+        /// date and timeZoneId are interpreted together as the room's local calendar day; returned
+        /// slot times are also local to timeZoneId. Only slots that fit entirely within the room's
+        /// business hours and do not overlap a Confirmed booking are returned - Pending, Rejected,
+        /// and Cancelled bookings never block availability, and back-to-back slots are allowed.
+        /// </remarks>
+        /// <response code="200">Availability retrieved successfully.</response>
+        /// <response code="400">Validation failed.</response>
+        /// <response code="404">Meeting room not found or is not active.</response>
+        [HttpGet("{id}/availability")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseWrapper<List<TimeSlotResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseWrapper<List<TimeSlotResponse>>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAvailability([FromRoute] int id, [FromQuery] GetRoomAvailabilityRequest request, CancellationToken cancellationToken)
+        {
+            var response = await _meetingRoomService.GetAvailability(id, request, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
         /// Updates a meeting room. Any field may be omitted (or null) to leave it unchanged.
         /// </summary>
         /// <remarks>

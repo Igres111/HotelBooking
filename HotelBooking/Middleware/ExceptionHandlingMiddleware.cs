@@ -93,6 +93,7 @@ namespace HotelBooking.Middleware
             ConflictException => HttpStatusCode.Conflict,
             DbUpdateConcurrencyException => HttpStatusCode.Conflict,
             DbUpdateException dbUpdateException when IsUniqueConstraintViolation(dbUpdateException) => HttpStatusCode.Conflict,
+            _ when IsDeadlock(exception) => HttpStatusCode.Conflict,
             _ => HttpStatusCode.InternalServerError
         };
 
@@ -118,11 +119,30 @@ namespace HotelBooking.Middleware
 
             DbUpdateException => "A database error occurred.",
 
+            _ when IsDeadlock(exception) => "This request conflicted with another concurrent operation. Please try again.",
+
             _ => "An unexpected error occurred."
         };
 
         private static bool IsUniqueConstraintViolation(DbUpdateException exception) =>
             exception.InnerException is SqlException sqlException &&
             (sqlException.Number == 2601 || sqlException.Number == 2627);
+
+        private static bool IsDeadlock(Exception exception)
+        {
+            var current = exception;
+
+            while (current is not null)
+            {
+                if (current is SqlException sqlException && sqlException.Number == 1205)
+                {
+                    return true;
+                }
+
+                current = current.InnerException;
+            }
+
+            return false;
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace HotelBooking.Models.Responses
         DateTime EndUtc,
         int AttendeeCount,
         string? Notes,
-        BookingStatus Status);
+        BookingStatus Status,
+        int? RecurringSeriesId);
 }

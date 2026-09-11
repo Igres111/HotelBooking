@@ -1,22 +1,29 @@
 using HotelBooking.Constants;
-using HotelBooking.Models.Requests;
 using HotelBooking.Services.Interfaces;
 
 namespace HotelBooking.Helpers
 {
     public static class BookingValidationHelper
     {
-        public static bool IsDurationWithinAllowedRange(CreateBookingRequest request)
+        public static bool IsDurationWithinAllowedRange(TimeSpan duration)
         {
-            var duration = request.EndTime - request.StartTime;
             return duration >= ValidatorConstants.Numbers.BookingMinimumDuration
                 && duration <= ValidatorConstants.Numbers.BookingMaximumDuration;
         }
 
-        public static bool IsThirtyMinuteIncrement(CreateBookingRequest request)
+        public static bool IsDurationWithinAllowedRange(TimeOnly startTime, TimeOnly endTime)
         {
-            var duration = request.EndTime - request.StartTime;
+            return IsDurationWithinAllowedRange(endTime - startTime);
+        }
+
+        public static bool IsThirtyMinuteIncrement(TimeSpan duration)
+        {
             return duration.TotalMinutes % ValidatorConstants.Numbers.BookingMinimumDuration.TotalMinutes == 0;
+        }
+
+        public static bool IsThirtyMinuteIncrement(TimeOnly startTime, TimeOnly endTime)
+        {
+            return IsThirtyMinuteIncrement(endTime - startTime);
         }
 
         public static bool IsValidTimeZone(string timezone)
@@ -24,17 +31,17 @@ namespace HotelBooking.Helpers
             return TimeZoneInfo.TryFindSystemTimeZoneById(timezone, out _);
         }
 
-        public static bool IsInTheFuture(CreateBookingRequest request, ITimeZoneConverter timeZoneConverter)
+        public static bool IsInTheFuture(DateOnly date, TimeOnly startTime, string timeZoneId, ITimeZoneConverter timeZoneConverter)
         {
-            var startUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(request.StartTime), request.TimeZoneId);
+            var startUtc = timeZoneConverter.ConvertToUtc(date.ToDateTime(startTime), timeZoneId);
             return startUtc > DateTime.UtcNow;
         }
 
-        public static bool IsWithinAdvanceBookingWindow(CreateBookingRequest request, ITimeZoneConverter timeZoneConverter)
+        public static bool IsWithinAdvanceBookingWindow(DateOnly date, string timeZoneId, ITimeZoneConverter timeZoneConverter)
         {
-            var todayLocal = DateOnly.FromDateTime(timeZoneConverter.ConvertFromUtc(DateTime.UtcNow, request.TimeZoneId));
+            var todayLocal = DateOnly.FromDateTime(timeZoneConverter.ConvertFromUtc(DateTime.UtcNow, timeZoneId));
             var latestAllowedDate = todayLocal.AddDays(ValidatorConstants.Numbers.MaximumAdvanceBookingDays);
-            return request.Date <= latestAllowedDate;
+            return date <= latestAllowedDate;
         }
     }
 }

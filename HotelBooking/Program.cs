@@ -44,6 +44,8 @@ builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidat
 builder.Services.AddScoped<IValidator<CreateMeetingRoomRequest>, CreateMeetingRoomRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateMeetingRoomRequest>, UpdateMeetingRoomRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateRecurringBookingRequest>, CreateRecurringBookingRequestValidator>();
+builder.Services.AddScoped<IValidator<GetRoomAvailabilityRequest>, GetRoomAvailabilityRequestValidator>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

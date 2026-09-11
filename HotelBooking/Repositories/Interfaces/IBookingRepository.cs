@@ -7,6 +7,7 @@ namespace HotelBooking.Repositories.Interfaces
     public interface IBookingRepository : IRepository<Booking>
     {
         Task<bool> HasOverlappingConfirmedBooking(int roomId, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
+        Task<List<Booking>> GetConfirmedBookingsInRange(int roomId, DateTime windowStartUtc, DateTime windowEndUtc, CancellationToken cancellationToken);
         Task<List<Booking>> GetAllWithDetails(CancellationToken cancellationToken);
         Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
@@ -17,5 +18,9 @@ namespace HotelBooking.Repositories.Interfaces
             int page,
             int pageSize,
             CancellationToken cancellationToken);
+
+        Task<BookingConfirmationResponse> TryConfirm(int bookingId, int actingUserId, CancellationToken cancellationToken);
+        Task<BookingRejectionResponse> TryReject(int bookingId, int actingUserId, string? reason, CancellationToken cancellationToken);
+        Task<BookingCancellationResponse> TryCancel(int bookingId, int actingUserId, bool isAdmin, string? reason, CancellationToken cancellationToken);
     }
 }
