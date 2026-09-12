@@ -104,7 +104,7 @@ many simultaneous duplicate registrations; exactly one `201`, the rest `409`, ex
 
 **Auth**: cookie-based (not JWT) — `AddAuthentication().AddCookie(...)` in `Program.cs`, with
 `HttpOnly`, `SecurePolicy = Always` (cookie only works over **https**, i.e. the `:7175` profile — testing
-over plain `:5062` silently fails to persist the session), and `SameSite = Lax`. `UserController.Login`
+over plain `:5062` silently fails to persist the session), and `SameSite = Lax`. `AuthController.Login`
 verifies credentials via `AuthService.Login`, then builds claims and calls `HttpContext.SignInAsync`
 itself in the controller (the service layer has no `HttpContext` dependency by design).
 `SameSite = Lax` was verified with a real cross-origin browser test (a form POST from a different

@@ -11,11 +11,11 @@ namespace HotelBooking.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
 
-        public UserController(IAuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
@@ -26,7 +26,7 @@ namespace HotelBooking.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /api/user
+        ///     POST /api/auth/signup
         ///     {
         ///         "fullName": "Jane Doe",
         ///         "email": "jane@example.com",
@@ -56,7 +56,7 @@ namespace HotelBooking.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /api/user/login
+        ///     POST /api/auth/login
         ///     {
         ///         "email": "jane@example.com",
         ///         "password": "Passw0rd!"
@@ -99,7 +99,7 @@ namespace HotelBooking.Controllers
         /// </summary>
         /// <response code="200">Logged out successfully.</response>
         [HttpPost("logout")]
-        [AllowAnonymous]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseWrapper), StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
