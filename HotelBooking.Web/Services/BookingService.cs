@@ -16,5 +16,15 @@ namespace HotelBooking.Web.Services
         {
             return await bookingApiClient.Create(request, cancellationToken);
         }
+
+        public async Task<ResponseWrapper<List<int>>> CreateRecurring(CreateRecurringBookingRequest request, CancellationToken cancellationToken)
+        {
+            return await bookingApiClient.CreateRecurring(request, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<BookingResponse>> Cancel(int id, CancellationToken cancellationToken)
+        {
+            return await bookingApiClient.Cancel(id, cancellationToken);
+        }
     }
 }

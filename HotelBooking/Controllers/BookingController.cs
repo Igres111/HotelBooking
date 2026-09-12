@@ -125,10 +125,12 @@ namespace HotelBooking.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     GET /api/booking?status=Pending&amp;sortBy=startutc&amp;sortDescending=true&amp;page=1&amp;pageSize=20
+        ///     GET /api/booking?status=Pending&amp;isRecurring=false&amp;sortBy=startutc&amp;sortDescending=true&amp;page=1&amp;pageSize=20
         ///
-        /// sortBy accepts "startutc" or "status" (defaults to "startutc"). Only bookings belonging
-        /// to the current user are returned - see GET /api/booking/admin for the unfiltered admin view.
+        /// sortBy accepts "startutc" or "status" (defaults to "startutc"). isRecurring filters to
+        /// bookings that were created as part of a recurring series (true) or standalone bookings
+        /// (false); omit it to return both. Only bookings belonging to the current user are returned -
+        /// see GET /api/booking/admin for the unfiltered admin view.
         /// </remarks>
         /// <response code="200">Bookings retrieved successfully.</response>
         [HttpGet]

@@ -33,20 +33,126 @@ else if (Model.TimeSlots is null || Model.TimeSlots.Count == 0)
 }
 else
 {
-    <ul class="list-group" style="max-width: 400px;">
+    <ul class="list-group" style="max-width: 650px;">
         @foreach (var slot in Model.TimeSlots)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>@slot.StartTime - @slot.EndTime</span>
-                <form asp-controller="Booking" asp-action="Create" method="post">
-                    <input type="hidden" name="RoomId" value="@Model.RoomId" />
-                    <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
-                    <input type="hidden" name="StartTime" value="@slot.StartTime.ToString("HH:mm:ss")" />
-                    <input type="hidden" name="EndTime" value="@slot.EndTime.ToString("HH:mm:ss")" />
-                    <input type="hidden" name="TimeZoneId" value="@Model.TimeZoneId" />
-                    <button type="submit" class="btn btn-sm btn-success">Book this hour</button>
-                </form>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-success"
+                            data-bs-toggle="modal" data-bs-target="#bookSlotModal"
+                            data-room-id="@Model.RoomId"
+                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
+                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
+                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
+                            data-time-zone-id="@Model.TimeZoneId"
+                            data-label="@slot.StartTime - @slot.EndTime">
+                        Book this slot
+                    </button>
+                    <button type="button" class="btn btn-sm text-white" style="background-color:#fd7e14;"
+                            data-bs-toggle="modal" data-bs-target="#createRecurringModal"
+                            data-room-id="@Model.RoomId"
+                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
+                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
+                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
+                            data-time-zone-id="@Model.TimeZoneId"
+                            data-label="@slot.StartTime - @slot.EndTime">
+                        + Create Recurring Bookings
+                    </button>
+                </div>
             </li>
         }
     </ul>
+}
+
+<div class="modal fade" id="bookSlotModal" tabindex="-1" aria-labelledby="bookSlotModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Booking" asp-action="Create" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookSlotModalLabel">Book <span id="bookSlotLabel"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="RoomId" id="bookSlotRoomId" />
+                    <input type="hidden" name="Date" id="bookSlotDate" />
+                    <input type="hidden" name="StartTime" id="bookSlotStartTime" />
+                    <input type="hidden" name="EndTime" id="bookSlotEndTime" />
+                    <input type="hidden" name="TimeZoneId" id="bookSlotTimeZoneId" />
+                    <div class="mb-3">
+                        <label class="form-label">Attendees</label>
+                        <input type="number" name="AttendeeCount" class="form-control" min="1" max="@Model.RoomCapacity" value="1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="Notes" class="form-control" rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Book this slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createRecurringModal" tabindex="-1" aria-labelledby="createRecurringModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Booking" asp-action="CreateRecurring" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createRecurringModalLabel">Create Recurring Booking <span id="recurSlotLabel"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="RoomId" id="recurRoomId" />
+                    <input type="hidden" name="StartDate" id="recurStartDate" />
+                    <input type="hidden" name="StartTime" id="recurStartTime" />
+                    <input type="hidden" name="EndTime" id="recurEndTime" />
+                    <input type="hidden" name="TimeZoneId" id="recurTimeZoneId" />
+                    <div class="mb-3">
+                        <label class="form-label">Attendees</label>
+                        <input type="number" name="AttendeeCount" class="form-control" min="1" max="@Model.RoomCapacity" value="1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="Notes" class="form-control" rows="3" maxlength="500"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Number of weekly occurrences</label>
+                        <input type="number" name="OccurrenceCount" class="form-control" min="1" max="4" value="4" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn text-white" style="background-color:#fd7e14;">Create Recurring Bookings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('bookSlotModal').addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            document.getElementById('bookSlotRoomId').value = button.getAttribute('data-room-id');
+            document.getElementById('bookSlotDate').value = button.getAttribute('data-date');
+            document.getElementById('bookSlotStartTime').value = button.getAttribute('data-start-time');
+            document.getElementById('bookSlotEndTime').value = button.getAttribute('data-end-time');
+            document.getElementById('bookSlotTimeZoneId').value = button.getAttribute('data-time-zone-id');
+            document.getElementById('bookSlotLabel').textContent = button.getAttribute('data-label');
+        });
+
+        document.getElementById('createRecurringModal').addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            document.getElementById('recurRoomId').value = button.getAttribute('data-room-id');
+            document.getElementById('recurStartDate').value = button.getAttribute('data-date');
+            document.getElementById('recurStartTime').value = button.getAttribute('data-start-time');
+            document.getElementById('recurEndTime').value = button.getAttribute('data-end-time');
+            document.getElementById('recurTimeZoneId').value = button.getAttribute('data-time-zone-id');
+            document.getElementById('recurSlotLabel').textContent = button.getAttribute('data-label');
+        });
+    </script>
 }

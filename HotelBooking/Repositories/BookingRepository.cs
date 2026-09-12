@@ -70,6 +70,7 @@ namespace HotelBooking.Repositories
         public async Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
             BookingStatus? status,
+            bool? isRecurring,
             string? sortBy,
             bool sortDescending,
             int page,
@@ -85,6 +86,13 @@ namespace HotelBooking.Repositories
             if (status.HasValue)
             {
                 query = query.Where(booking => booking.Status == status.Value);
+            }
+
+            if (isRecurring.HasValue)
+            {
+                query = isRecurring.Value
+                    ? query.Where(booking => booking.RecurringSeriesId != null)
+                    : query.Where(booking => booking.RecurringSeriesId == null);
             }
 
             var normalizedSortBy = sortBy?.ToLower();

@@ -23,6 +23,11 @@ namespace HotelBooking.Web.ApiClients
                 queryParams["Status"] = request.Status.Value.ToString();
             }
 
+            if (request.IsRecurring.HasValue)
+            {
+                queryParams["IsRecurring"] = request.IsRecurring.Value.ToString();
+            }
+
             if (!string.IsNullOrWhiteSpace(request.SortBy))
             {
                 queryParams["SortBy"] = request.SortBy;
@@ -46,6 +51,26 @@ namespace HotelBooking.Web.ApiClients
             var response = await httpClient.SendAsync(httpRequest, cancellationToken);
 
             return await ApiResponseHelper.ParseResponse<int>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<List<int>>> CreateRecurring(CreateRecurringBookingRequest request, CancellationToken cancellationToken)
+        {
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/booking/recurring")
+            {
+                Content = JsonContent.Create(request)
+            };
+            httpRequest.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+            var response = await httpClient.SendAsync(httpRequest, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<List<int>>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<BookingResponse>> Cancel(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PostAsync($"api/booking/{id}/cancel", null, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
         }
     }
 }

@@ -1,5 +1,6 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using HotelBooking.Web.Models.Enums
+@using HotelBooking.Web.Models.Responses
 @model HotelBooking.Web.Models.ViewModels.BookingListViewModel
 
 @{
@@ -13,6 +14,17 @@
     bool NextDirection(string column) => IsSortedBy(column) && !Model.SortDescending;
 
     string SortIndicator(string column) => IsSortedBy(column) ? (Model.SortDescending ? " ▼" : " ▲") : "";
+
+    async Task RenderCancelForm(BookingResponse booking)
+    {
+        if (booking.Status == BookingStatus.Pending || booking.Status == BookingStatus.Confirmed)
+        {
+            <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-link text-danger p-0">Cancel</button>
+            </form>
+        }
+        await Task.CompletedTask;
+    }
 }
 
 <h1>My Bookings</h1>
@@ -33,69 +45,120 @@
     </div>
 </form>
 
-@if (Model.Bookings is null || Model.Bookings.Items.Count == 0)
-{
-    <p>No bookings found.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Room</th>
-                <th>
-                    <a asp-controller="Booking" asp-action="Index"
-                       asp-route-status="@Model.Status"
-                       asp-route-sortby="startutc" asp-route-sortdescending="@NextDirection("startutc")" asp-route-page="1" asp-route-pagesize="@Model.Bookings.PageSize">
-                        Start Time@(SortIndicator("startutc"))
-                    </a>
-                </th>
-                <th>End Time</th>
-                <th>Attendees</th>
-                <th>Notes</th>
-                <th>
-                    <a asp-controller="Booking" asp-action="Index"
-                       asp-route-status="@Model.Status"
-                       asp-route-sortby="status" asp-route-sortdescending="@NextDirection("status")" asp-route-page="1" asp-route-pagesize="@Model.Bookings.PageSize">
-                        Status@(SortIndicator("status"))
-                    </a>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var booking in Model.Bookings.Items)
-            {
-                <tr>
-                    <td>@booking.RoomName</td>
-                    <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
-                    <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
-                    <td>@booking.AttendeeCount</td>
-                    <td>@booking.Notes</td>
-                    <td>@booking.Status</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Individual Bookings</h4>
 
-    <nav>
-        <ul class="pagination">
-            <li class="page-item @(Model.Bookings.Page <= 1 ? "disabled" : "")">
-                <a class="page-link" asp-controller="Booking" asp-action="Index"
-                   asp-route-status="@Model.Status"
-                   asp-route-sortby="@Model.SortBy" asp-route-sortdescending="@Model.SortDescending" asp-route-page="@(Model.Bookings.Page - 1)" asp-route-pagesize="@Model.Bookings.PageSize">
-                    Previous
-                </a>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">Page @Model.Bookings.Page of @Model.Bookings.TotalPages</span>
-            </li>
-            <li class="page-item @(Model.Bookings.Page >= Model.Bookings.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-controller="Booking" asp-action="Index"
-                   asp-route-status="@Model.Status"
-                   asp-route-sortby="@Model.SortBy" asp-route-sortdescending="@Model.SortDescending" asp-route-page="@(Model.Bookings.Page + 1)" asp-route-pagesize="@Model.Bookings.PageSize">
-                    Next
-                </a>
-            </li>
-        </ul>
-    </nav>
-}
+        @if (Model.Bookings is null || Model.Bookings.Items.Count == 0)
+        {
+            <p>No bookings found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>
+                                <a asp-controller="Booking" asp-action="Index"
+                                   asp-route-status="@Model.Status"
+                                   asp-route-sortby="startutc" asp-route-sortdescending="@NextDirection("startutc")" asp-route-page="1" asp-route-pagesize="@Model.Bookings.PageSize">
+                                    Start Time@(SortIndicator("startutc"))
+                                </a>
+                            </th>
+                            <th>End Time</th>
+                            <th>Attendees</th>
+                            <th>Notes</th>
+                            <th>
+                                <a asp-controller="Booking" asp-action="Index"
+                                   asp-route-status="@Model.Status"
+                                   asp-route-sortby="status" asp-route-sortdescending="@NextDirection("status")" asp-route-page="1" asp-route-pagesize="@Model.Bookings.PageSize">
+                                    Status@(SortIndicator("status"))
+                                </a>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model.Bookings.Items)
+                        {
+                            <tr>
+                                <td>@booking.RoomName</td>
+                                <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
+                                <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
+                                <td>@booking.AttendeeCount</td>
+                                <td>@booking.Notes</td>
+                                <td>@booking.Status</td>
+                                <td>@{ await RenderCancelForm(booking); }</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(Model.Bookings.Page <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-controller="Booking" asp-action="Index"
+                           asp-route-status="@Model.Status"
+                           asp-route-sortby="@Model.SortBy" asp-route-sortdescending="@Model.SortDescending" asp-route-page="@(Model.Bookings.Page - 1)" asp-route-pagesize="@Model.Bookings.PageSize">
+                            Previous
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Page @Model.Bookings.Page of @Model.Bookings.TotalPages</span>
+                    </li>
+                    <li class="page-item @(Model.Bookings.Page >= Model.Bookings.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-controller="Booking" asp-action="Index"
+                           asp-route-status="@Model.Status"
+                           asp-route-sortby="@Model.SortBy" asp-route-sortdescending="@Model.SortDescending" asp-route-page="@(Model.Bookings.Page + 1)" asp-route-pagesize="@Model.Bookings.PageSize">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+
+    <div class="col-md-6">
+        <h4>Recurring Bookings</h4>
+
+        @if (Model.RecurringBookings is null || Model.RecurringBookings.Items.Count == 0)
+        {
+            <p>No recurring bookings found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Attendees</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model.RecurringBookings.Items)
+                        {
+                            <tr>
+                                <td>@booking.RoomName</td>
+                                <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
+                                <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
+                                <td>@booking.AttendeeCount</td>
+                                <td>@booking.Notes</td>
+                                <td>@booking.Status</td>
+                                <td>@{ await RenderCancelForm(booking); }</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

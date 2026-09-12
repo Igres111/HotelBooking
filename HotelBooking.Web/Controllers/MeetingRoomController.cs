@@ -48,6 +48,7 @@ namespace HotelBooking.Web.Controllers
             {
                 RoomId = id,
                 RoomName = roomResponse.Data.Name,
+                RoomCapacity = roomResponse.Data.Capacity,
                 Date = effectiveDate,
                 DurationMinutes = effectiveDuration,
                 TimeZoneId = effectiveTimeZoneId

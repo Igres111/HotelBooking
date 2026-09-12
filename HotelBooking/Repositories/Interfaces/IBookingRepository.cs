@@ -14,6 +14,7 @@ namespace HotelBooking.Repositories.Interfaces
         Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
             BookingStatus? status,
+            bool? isRecurring,
             string? sortBy,
             bool sortDescending,
             int page,

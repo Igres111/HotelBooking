@@ -334,6 +334,7 @@ namespace HotelBooking.Services
             var pagedBookings = await bookingRepository.GetForUserPaged(
                 userId: userId,
                 status: request.Status,
+                isRecurring: request.IsRecurring,
                 sortBy: request.SortBy,
                 sortDescending: request.SortDescending,
                 page: page,
