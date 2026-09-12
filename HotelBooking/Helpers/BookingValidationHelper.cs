@@ -43,5 +43,11 @@ namespace HotelBooking.Helpers
             var latestAllowedDate = todayLocal.AddDays(ValidatorConstants.Numbers.MaximumAdvanceBookingDays);
             return date <= latestAllowedDate;
         }
+
+        public static bool IsNotInThePast(DateOnly date, string timeZoneId, ITimeZoneConverter timeZoneConverter)
+        {
+            var todayLocal = DateOnly.FromDateTime(timeZoneConverter.ConvertFromUtc(DateTime.UtcNow, timeZoneId));
+            return date >= todayLocal;
+        }
     }
 }

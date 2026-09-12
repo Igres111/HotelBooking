@@ -11,6 +11,11 @@ namespace HotelBooking.Web.Helpers
         {
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return new ResponseWrapper<T>(false, (int)response.StatusCode, response.ReasonPhrase ?? "An error occurred.", default);
+            }
+
             using var document = JsonDocument.Parse(content);
 
             if (document.RootElement.TryGetProperty("isSuccess", out _))

@@ -39,19 +39,24 @@ namespace HotelBooking.Web.Services
 
             if (!validationResult.IsValid)
             {
-                return new LoginResultResponse(validationResult, null);
+                return new LoginResultResponse(validationResult, null, null);
             }
 
             var request = new LoginUserRequest(model.Email, model.Password);
-            var response = await authApiClient.Login(request, cancellationToken);
+            var result = await authApiClient.Login(request, cancellationToken);
 
-            if (!response.IsSuccess)
+            if (!result.Response.IsSuccess)
             {
-                validationResult.Errors.Add(new ValidationFailure(string.Empty, response.Message));
-                return new LoginResultResponse(validationResult, null);
+                validationResult.Errors.Add(new ValidationFailure(string.Empty, result.Response.Message));
+                return new LoginResultResponse(validationResult, null, null);
             }
 
-            return new LoginResultResponse(validationResult, response.Data);
+            return new LoginResultResponse(validationResult, result.Response.Data, result.ApiAuthCookie);
+        }
+
+        public async Task<ResponseWrapper> Logout(CancellationToken cancellationToken)
+        {
+            return await authApiClient.Logout(cancellationToken);
         }
     }
 }

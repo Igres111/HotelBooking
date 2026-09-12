@@ -13,7 +13,6 @@ namespace HotelBooking.Repositories.Interfaces
         Task<List<BookingStatusHistory>> GetStatusHistory(int bookingId, CancellationToken cancellationToken);
         Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
-            int? roomId,
             BookingStatus? status,
             string? sortBy,
             bool sortDescending,

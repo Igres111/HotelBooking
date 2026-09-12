@@ -8,5 +8,6 @@ namespace HotelBooking.Web.Services.Interfaces
     {
         Task<ValidationResult> SignUp(SignUpViewModel model, CancellationToken cancellationToken);
         Task<LoginResultResponse> Login(LoginViewModel model, CancellationToken cancellationToken);
+        Task<ResponseWrapper> Logout(CancellationToken cancellationToken);
     }
 }

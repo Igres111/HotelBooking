@@ -125,7 +125,7 @@ namespace HotelBooking.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     GET /api/booking?roomId=1&amp;status=Pending&amp;sortBy=startutc&amp;sortDescending=true&amp;page=1&amp;pageSize=20
+        ///     GET /api/booking?status=Pending&amp;sortBy=startutc&amp;sortDescending=true&amp;page=1&amp;pageSize=20
         ///
         /// sortBy accepts "startutc" or "status" (defaults to "startutc"). Only bookings belonging
         /// to the current user are returned - see GET /api/booking/admin for the unfiltered admin view.

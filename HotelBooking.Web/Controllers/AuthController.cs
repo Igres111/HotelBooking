@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using HotelBooking.Web.Handlers;
 using HotelBooking.Web.Models.ViewModels;
 using HotelBooking.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
@@ -74,6 +75,11 @@ namespace HotelBooking.Web.Controllers
                 new(ClaimTypes.Role, user.Role.ToString())
             };
 
+            if (!string.IsNullOrEmpty(result.ApiAuthCookie))
+            {
+                claims.Add(new Claim(ApiAuthCookieHandler.ClaimType, result.ApiAuthCookie));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
@@ -85,6 +91,17 @@ namespace HotelBooking.Web.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+        {
+            await _authService.Logout(cancellationToken);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            TempData["SuccessMessage"] = "Logged out successfully.";
+            return RedirectToAction("Login", "Auth");
         }
     }
 }

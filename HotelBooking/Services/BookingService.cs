@@ -333,7 +333,6 @@ namespace HotelBooking.Services
 
             var pagedBookings = await bookingRepository.GetForUserPaged(
                 userId: userId,
-                roomId: request.RoomId,
                 status: request.Status,
                 sortBy: request.SortBy,
                 sortDescending: request.SortDescending,

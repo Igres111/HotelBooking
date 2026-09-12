@@ -28,9 +28,21 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="MeetingRoom" asp-action="Index">Room Catalog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Booking" asp-action="Index">My Bookings</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="SignUp">Sign Up</a>
                         </li>
                     </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Log Out</button>
+                        </form>
+                    }
                 </div>
             </div>
         </nav>
@@ -39,6 +51,10 @@
         @if (TempData["SuccessMessage"] is string successMessage)
         {
             <div class="alert alert-success mt-3">@successMessage</div>
+        }
+        @if (TempData["ErrorMessage"] is string errorMessage)
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
         }
         <main role="main" class="pb-3">
             @RenderBody()

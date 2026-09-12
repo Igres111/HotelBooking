@@ -1,6 +1,7 @@
 using FluentValidation;
 using HotelBooking.Web.ApiClients;
 using HotelBooking.Web.ApiClients.Interfaces;
+using HotelBooking.Web.Handlers;
 using HotelBooking.Web.Middleware;
 using HotelBooking.Web.Models.ViewModels;
 using HotelBooking.Web.Services;
@@ -28,14 +29,35 @@ builder.Services.AddControllersWithViews(options =>
         .Build()));
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<ApiAuthCookieHandler>();
+
 builder.Services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
-});
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
+    .AddHttpMessageHandler<ApiAuthCookieHandler>();
+
+builder.Services.AddHttpClient<IMeetingRoomApiClient, MeetingRoomApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
+    .AddHttpMessageHandler<ApiAuthCookieHandler>();
+
+builder.Services.AddHttpClient<IBookingApiClient, BookingApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
+    .AddHttpMessageHandler<ApiAuthCookieHandler>();
 
 builder.Services.AddScoped<IValidator<SignUpViewModel>, SignUpViewModelValidator>();
 builder.Services.AddScoped<IValidator<LoginViewModel>, LoginViewModelValidator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

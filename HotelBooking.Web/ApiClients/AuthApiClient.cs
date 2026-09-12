@@ -15,11 +15,32 @@ namespace HotelBooking.Web.ApiClients
             return await ApiResponseHelper.ParseResponse<int>(response, cancellationToken);
         }
 
-        public async Task<ResponseWrapper<UserResponse>> Login(LoginUserRequest request, CancellationToken cancellationToken)
+        public async Task<LoginApiResult> Login(LoginUserRequest request, CancellationToken cancellationToken)
         {
             var response = await httpClient.PostAsJsonAsync("api/auth/login", request, cancellationToken);
 
-            return await ApiResponseHelper.ParseResponse<UserResponse>(response, cancellationToken);
+            var parsedResponse = await ApiResponseHelper.ParseResponse<UserResponse>(response, cancellationToken);
+
+            string? apiAuthCookie = null;
+
+            if (response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders))
+            {
+                var authCookieHeader = setCookieHeaders.FirstOrDefault(header => header.StartsWith("HotelBooking.Auth="));
+
+                if (authCookieHeader is not null)
+                {
+                    apiAuthCookie = authCookieHeader.Split(';')[0];
+                }
+            }
+
+            return new LoginApiResult(parsedResponse, apiAuthCookie);
+        }
+
+        public async Task<ResponseWrapper> Logout(CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PostAsync("api/auth/logout", null, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<object>(response, cancellationToken);
         }
     }
 }

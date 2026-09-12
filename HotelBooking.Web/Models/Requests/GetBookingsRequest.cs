@@ -1,6 +1,6 @@
-using HotelBooking.Models.Enums;
+using HotelBooking.Web.Models.Enums;
 
-namespace HotelBooking.Models.Requests
+namespace HotelBooking.Web.Models.Requests
 {
     public record GetBookingsRequest(
         BookingStatus? Status = null,

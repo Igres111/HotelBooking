@@ -276,6 +276,11 @@ namespace HotelBooking.Services
                 var candidateStartUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(candidateStart), request.TimeZoneId);
                 var candidateEndUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(candidateEnd), request.TimeZoneId);
 
+                if (candidateStartUtc <= DateTime.UtcNow)
+                {
+                    continue;
+                }
+
                 var hasOverlap = confirmedBookings.Any(booking =>
                     booking.StartUtc < candidateEndUtc &&
                     candidateStartUtc < booking.EndUtc);

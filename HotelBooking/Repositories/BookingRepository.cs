@@ -69,7 +69,6 @@ namespace HotelBooking.Repositories
 
         public async Task<PagedResult<Booking>> GetForUserPaged(
             int userId,
-            int? roomId,
             BookingStatus? status,
             string? sortBy,
             bool sortDescending,
@@ -82,11 +81,6 @@ namespace HotelBooking.Repositories
                 .Include(booking => booking.Room)
                 .Include(booking => booking.User)
                 .Where(booking => booking.UserId == userId && booking.DeletedAt == null);
-
-            if (roomId.HasValue)
-            {
-                query = query.Where(booking => booking.RoomId == roomId.Value);
-            }
 
             if (status.HasValue)
             {
