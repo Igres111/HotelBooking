@@ -10,6 +10,7 @@ namespace HotelBooking.Web.ApiClients.Interfaces
         Task<ResponseWrapper<PagedResult<MeetingRoomsResponse>>> GetAllActive(GetMeetingRoomsRequest request, CancellationToken cancellationToken);
         Task<ResponseWrapper<MeetingRoomsResponse>> GetActiveById(int id, CancellationToken cancellationToken);
         Task<ResponseWrapper<List<TimeSlotResponse>>> GetAvailability(int id, GetRoomAvailabilityRequest request, CancellationToken cancellationToken);
+        Task<ResponseWrapper<List<TimeSlotResponse>>> GetOccupiedHours(int id, GetOccupiedHoursRequest request, CancellationToken cancellationToken);
         Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllForAdmin(CancellationToken cancellationToken);
         Task<ResponseWrapper<MeetingRoomsResponse>> GetByIdForAdmin(int id, CancellationToken cancellationToken);
     }

@@ -17,6 +17,11 @@ namespace HotelBooking.Web.Services
             return await bookingApiClient.GetAllForAdmin(cancellationToken);
         }
 
+        public async Task<byte[]> ExportFile(CancellationToken cancellationToken)
+        {
+            return await bookingApiClient.ExportFile(cancellationToken);
+        }
+
         public async Task<ResponseWrapper<BookingResponse>> GetById(int id, CancellationToken cancellationToken)
         {
             return await bookingApiClient.GetById(id, cancellationToken);

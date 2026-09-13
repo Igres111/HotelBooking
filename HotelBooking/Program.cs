@@ -37,6 +37,7 @@ builder.Services.AddScoped<IIdempotencyRecordRepository, IdempotencyRecordReposi
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddSingleton<ITimeZoneConverter, TimeZoneConverter>();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
 builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
@@ -45,6 +46,8 @@ builder.Services.AddScoped<IValidator<UpdateMeetingRoomRequest>, UpdateMeetingRo
 builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateRecurringBookingRequest>, CreateRecurringBookingRequestValidator>();
 builder.Services.AddScoped<IValidator<GetRoomAvailabilityRequest>, GetRoomAvailabilityRequestValidator>();
+builder.Services.AddScoped<IValidator<GetOccupiedHoursRequest>, GetOccupiedHoursRequestValidator>();
+builder.Services.AddScoped<IValidator<GetDashboardRequest>, GetDashboardRequestValidator>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

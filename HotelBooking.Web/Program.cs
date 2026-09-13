@@ -53,6 +53,13 @@ builder.Services.AddHttpClient<IBookingApiClient, BookingApiClient>(client =>
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
     .AddHttpMessageHandler<ApiAuthCookieHandler>();
 
+builder.Services.AddHttpClient<IDashboardApiClient, DashboardApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
+    .AddHttpMessageHandler<ApiAuthCookieHandler>();
+
 builder.Services.AddScoped<IValidator<SignUpViewModel>, SignUpViewModelValidator>();
 builder.Services.AddScoped<IValidator<LoginViewModel>, LoginViewModelValidator>();
 builder.Services.AddScoped<IValidator<CreateMeetingRoomViewModel>, CreateMeetingRoomViewModelValidator>();
@@ -62,6 +69,7 @@ builder.Services.AddScoped<IValidator<CreateRecurringBookingViewModel>, CreateRe
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

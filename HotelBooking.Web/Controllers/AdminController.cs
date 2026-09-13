@@ -12,19 +12,36 @@ namespace HotelBooking.Web.Controllers
     {
         private readonly IMeetingRoomService _meetingRoomService;
         private readonly IBookingService _bookingService;
+        private readonly IDashboardService _dashboardService;
         private readonly IValidator<CreateMeetingRoomViewModel> _createMeetingRoomViewModelValidator;
         private readonly IValidator<UpdateMeetingRoomViewModel> _updateMeetingRoomViewModelValidator;
 
         public AdminController(
             IMeetingRoomService meetingRoomService,
             IBookingService bookingService,
+            IDashboardService dashboardService,
             IValidator<CreateMeetingRoomViewModel> createMeetingRoomViewModelValidator,
             IValidator<UpdateMeetingRoomViewModel> updateMeetingRoomViewModelValidator)
         {
             _meetingRoomService = meetingRoomService;
             _bookingService = bookingService;
+            _dashboardService = dashboardService;
             _createMeetingRoomViewModelValidator = createMeetingRoomViewModelValidator;
             _updateMeetingRoomViewModelValidator = updateMeetingRoomViewModelValidator;
+        }
+
+        public async Task<IActionResult> Dashboard(
+            int? year,
+            int? month,
+            int? roomId,
+            DateOnly? date,
+            TimeOnly? fromTime,
+            TimeOnly? toTime,
+            CancellationToken cancellationToken)
+        {
+            var viewModel = await _dashboardService.GetDashboardViewModel(year, month, roomId, date, fromTime, toTime, cancellationToken);
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> AllBookings(CancellationToken cancellationToken)
@@ -32,6 +49,14 @@ namespace HotelBooking.Web.Controllers
             var response = await _bookingService.GetAllForAdmin(cancellationToken);
 
             return View(response.Data ?? []);
+        }
+
+        public async Task<IActionResult> ExportBookings(CancellationToken cancellationToken)
+        {
+            var bytes = await _bookingService.ExportFile(cancellationToken);
+            var fileName = $"bookings-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+
+            return File(bytes, "text/csv", fileName);
         }
 
         public async Task<IActionResult> AllRooms(CancellationToken cancellationToken)

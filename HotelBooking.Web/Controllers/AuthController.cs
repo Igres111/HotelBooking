@@ -43,7 +43,7 @@ namespace HotelBooking.Web.Controllers
             }
 
             TempData["SuccessMessage"] = "Account created successfully. You can now log in.";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Auth");
         }
 
         [HttpGet]
@@ -101,7 +101,7 @@ namespace HotelBooking.Web.Controllers
 
         private IActionResult DefaultLandingPage(bool isAdmin)
         {
-            return isAdmin ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Booking");
+            return isAdmin ? RedirectToAction("Dashboard", "Admin") : RedirectToAction("Index", "Booking");
         }
 
         [HttpPost]

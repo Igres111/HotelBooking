@@ -32,6 +32,11 @@ namespace HotelBooking.Web.Services
             return await meetingRoomApiClient.GetAvailability(id, request, cancellationToken);
         }
 
+        public async Task<ResponseWrapper<List<TimeSlotResponse>>> GetOccupiedHours(int id, GetOccupiedHoursRequest request, CancellationToken cancellationToken)
+        {
+            return await meetingRoomApiClient.GetOccupiedHours(id, request, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllForAdmin(CancellationToken cancellationToken)
         {
             return await meetingRoomApiClient.GetAllForAdmin(cancellationToken);

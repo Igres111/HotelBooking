@@ -9,6 +9,7 @@ namespace HotelBooking.Repositories.Interfaces
         Task<bool> HasOverlappingConfirmedBooking(int roomId, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
         Task<List<Booking>> GetConfirmedBookingsInRange(int roomId, DateTime windowStartUtc, DateTime windowEndUtc, CancellationToken cancellationToken);
         Task<List<Booking>> GetAllWithDetails(CancellationToken cancellationToken);
+        Task<List<(BookingStatus Status, int Count)>> GetStatusCounts(DateTime? createdFromUtc, DateTime? createdToUtc, CancellationToken cancellationToken);
         Task<Booking?> GetByIdWithDetails(int id, CancellationToken cancellationToken);
         Task<List<BookingStatusHistory>> GetStatusHistory(int bookingId, CancellationToken cancellationToken);
         Task<PagedResult<Booking>> GetForUserPaged(

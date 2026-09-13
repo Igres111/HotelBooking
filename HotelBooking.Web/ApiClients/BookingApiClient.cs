@@ -47,6 +47,13 @@ namespace HotelBooking.Web.ApiClients
             return await ApiResponseHelper.ParseResponse<List<BookingResponse>>(response, cancellationToken);
         }
 
+        public async Task<byte[]> ExportFile(CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync("api/booking/admin/export", cancellationToken);
+
+            return await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        }
+
         public async Task<ResponseWrapper<BookingResponse>> GetById(int id, CancellationToken cancellationToken)
         {
             var response = await httpClient.GetAsync($"api/booking/{id}", cancellationToken);

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using FluentValidation;
 using HotelBooking.Constants;
@@ -321,6 +322,36 @@ namespace HotelBooking.Services
                 (int)HttpStatusCode.OK,
                 "Bookings retrieved successfully.",
                 response);
+        }
+
+        public async Task<ResponseWrapper<string>> ExportFile(CancellationToken cancellationToken)
+        {
+            var bookings = await bookingRepository.GetAllWithDetails(cancellationToken);
+
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,RoomId,RoomName,UserId,UserFullName,StartUtc,EndUtc,AttendeeCount,Notes,Status,RecurringSeriesId");
+
+            foreach (var booking in bookings)
+            {
+                csv.AppendLine(string.Join(",",
+                    booking.Id,
+                    booking.RoomId,
+                    CsvExportHelper.EscapeField(booking.Room!.Name),
+                    booking.UserId,
+                    CsvExportHelper.EscapeField(booking.User!.FullName),
+                    booking.StartUtc.ToString("O"),
+                    booking.EndUtc.ToString("O"),
+                    booking.AttendeeCount,
+                    CsvExportHelper.EscapeField(booking.Notes),
+                    booking.Status,
+                    booking.RecurringSeriesId));
+            }
+
+            return new ResponseWrapper<string>(
+                true,
+                (int)HttpStatusCode.OK,
+                "Bookings exported successfully.",
+                csv.ToString());
         }
 
         public async Task<ResponseWrapper<PagedResult<BookingResponse>>> GetAllForUser(int userId, GetBookingsRequest request, CancellationToken cancellationToken)

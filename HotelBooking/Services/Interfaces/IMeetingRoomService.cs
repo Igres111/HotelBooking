@@ -12,5 +12,6 @@ namespace HotelBooking.Services.Interfaces
         Task<ResponseWrapper<MeetingRoomsResponse>> GetByIdForAdmin(int id, CancellationToken cancellationToken);
         Task<ResponseWrapper<MeetingRoomsResponse>> Update(int id, UpdateMeetingRoomRequest request, CancellationToken cancellationToken);
         Task<ResponseWrapper<List<TimeSlotResponse>>> GetAvailability(int roomId, GetRoomAvailabilityRequest request, CancellationToken cancellationToken);
+        Task<ResponseWrapper<List<TimeSlotResponse>>> GetOccupiedHours(int roomId, GetOccupiedHoursRequest request, CancellationToken cancellationToken);
     }
 }

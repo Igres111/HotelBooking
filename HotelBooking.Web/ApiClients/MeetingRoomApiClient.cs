@@ -82,6 +82,23 @@ namespace HotelBooking.Web.ApiClients
             return await ApiResponseHelper.ParseResponse<List<TimeSlotResponse>>(response, cancellationToken);
         }
 
+        public async Task<ResponseWrapper<List<TimeSlotResponse>>> GetOccupiedHours(int id, GetOccupiedHoursRequest request, CancellationToken cancellationToken)
+        {
+            var queryParams = new Dictionary<string, string?>
+            {
+                ["Date"] = request.Date.ToString("yyyy-MM-dd"),
+                ["FromTime"] = request.FromTime.ToString("HH:mm"),
+                ["ToTime"] = request.ToTime.ToString("HH:mm"),
+                ["TimeZoneId"] = request.TimeZoneId
+            };
+
+            var url = QueryHelpers.AddQueryString($"api/meetingroom/{id}/occupied-hours", queryParams);
+
+            var response = await httpClient.GetAsync(url, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<List<TimeSlotResponse>>(response, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllForAdmin(CancellationToken cancellationToken)
         {
             var response = await httpClient.GetAsync("api/meetingroom/admin", cancellationToken);

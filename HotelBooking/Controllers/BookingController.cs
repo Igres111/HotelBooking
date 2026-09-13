@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
 using HotelBooking.Services.Interfaces;
@@ -206,6 +207,27 @@ namespace HotelBooking.Controllers
             var response = await _bookingService.GetAllForAdmin(cancellationToken);
 
             return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Exports every booking, across all users and rooms, as a CSV file.
+        /// </summary>
+        /// <remarks>
+        /// Administrator role required. Uses the same underlying data as GET /api/booking/admin.
+        /// </remarks>
+        /// <response code="200">CSV file generated successfully.</response>
+        [HttpGet("admin/export")]
+        [Authorize(Roles = "Administrator")]
+        [Produces("text/csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExportFile(CancellationToken cancellationToken)
+        {
+            var response = await _bookingService.ExportFile(cancellationToken);
+
+            var bytes = Encoding.UTF8.GetBytes(response.Data!);
+            var fileName = $"bookings-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+
+            return File(bytes, "text/csv", fileName);
         }
 
         /// <summary>

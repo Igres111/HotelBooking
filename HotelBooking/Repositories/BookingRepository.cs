@@ -48,6 +48,30 @@ namespace HotelBooking.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<(BookingStatus Status, int Count)>> GetStatusCounts(DateTime? createdFromUtc, DateTime? createdToUtc, CancellationToken cancellationToken)
+        {
+            var query = Context.Bookings
+                .AsNoTracking()
+                .Where(booking => booking.DeletedAt == null);
+
+            if (createdFromUtc.HasValue)
+            {
+                query = query.Where(booking => booking.CreatedAt >= createdFromUtc.Value);
+            }
+
+            if (createdToUtc.HasValue)
+            {
+                query = query.Where(booking => booking.CreatedAt < createdToUtc.Value);
+            }
+
+            var groups = await query
+                .GroupBy(booking => booking.Status)
+                .Select(group => new { group.Key, Count = group.Count() })
+                .ToListAsync(cancellationToken);
+
+            return groups.Select(group => (group.Key, group.Count)).ToList();
+        }
+
         public Task<Booking?> GetByIdWithDetails(int id, CancellationToken cancellationToken)
         {
             return Context.Bookings

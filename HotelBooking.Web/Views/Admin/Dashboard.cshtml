@@ -1,0 +1,118 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model HotelBooking.Web.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var monthNames = System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat.MonthNames;
+}
+
+<h1>Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-controller="Admin" asp-action="Dashboard" method="get" class="row g-2 mb-3">
+            <input type="hidden" name="roomId" value="@Model.RoomId" />
+            <input type="hidden" name="date" value="@Model.UtilizationDate.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="fromTime" value="@Model.FromTime.ToString("HH:mm")" />
+            <input type="hidden" name="toTime" value="@Model.ToTime.ToString("HH:mm")" />
+            <div class="col-auto">
+                <label class="form-label">Month</label>
+                <select name="month" class="form-select">
+                    @for (var i = 1; i <= 12; i++)
+                    {
+                        <option value="@i" selected="@(i == Model.Month)">@monthNames[i - 1]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label">Year</label>
+                <input type="number" name="year" value="@Model.Year" class="form-control" />
+            </div>
+            <div class="col-auto align-self-end">
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </div>
+        </form>
+
+        <dl class="row" style="max-width: 500px;">
+            <dt class="col-sm-6">Total Bookings</dt>
+            <dd class="col-sm-6">@Model.TotalBookings</dd>
+
+            <dt class="col-sm-6">Pending Bookings</dt>
+            <dd class="col-sm-6">@Model.PendingBookings</dd>
+
+            <dt class="col-sm-6">Confirmed Bookings</dt>
+            <dd class="col-sm-6">@Model.ConfirmedBookings</dd>
+
+            <dt class="col-sm-6">Cancelled Bookings</dt>
+            <dd class="col-sm-6">@Model.CancelledBookings</dd>
+        </dl>
+
+        <div style="max-width: 600px;">
+            <canvas id="statisticsChart"
+                    data-total="@Model.TotalBookings"
+                    data-confirmed="@Model.ConfirmedBookings"
+                    data-cancelled="@Model.CancelledBookings"></canvas>
+        </div>
+
+        <a asp-controller="Admin" asp-action="ExportBookings" download class="btn btn-success mt-3">Export booking data to CSV.</a>
+    </div>
+
+    <div class="col-md-6">
+        <h2 class="h4">Room Utilization</h2>
+
+        @if (Model.Rooms.Count == 0)
+        {
+            <p>No active rooms available.</p>
+        }
+        else
+        {
+            <form asp-controller="Admin" asp-action="Dashboard" method="get" class="row g-2 mb-3">
+                <input type="hidden" name="month" value="@Model.Month" />
+                <input type="hidden" name="year" value="@Model.Year" />
+                <div class="col-auto">
+                    <label class="form-label">Room</label>
+                    <select name="roomId" class="form-select">
+                        @foreach (var room in Model.Rooms)
+                        {
+                            <option value="@room.Id" selected="@(room.Id == Model.RoomId)">@room.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="date" value="@Model.UtilizationDate.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">From</label>
+                    <input type="time" name="fromTime" value="@Model.FromTime.ToString("HH:mm")" class="form-control" />
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">To</label>
+                    <input type="time" name="toTime" value="@Model.ToTime.ToString("HH:mm")" class="form-control" />
+                </div>
+                <div class="col-auto align-self-end">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </form>
+
+            @if (Model.OccupiedSlots.Count == 0)
+            {
+                <p>No confirmed bookings in this window.</p>
+            }
+            else
+            {
+                <ul class="list-group" style="max-width: 300px;">
+                    @foreach (var slot in Model.OccupiedSlots)
+                    {
+                        <li class="list-group-item">@slot.StartTime - @slot.EndTime</li>
+                    }
+                </ul>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

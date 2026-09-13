@@ -15,6 +15,7 @@ namespace HotelBooking.Services
         IValidator<CreateMeetingRoomRequest> createMeetingRoomRequestValidator,
         IValidator<UpdateMeetingRoomRequest> updateMeetingRoomRequestValidator,
         IValidator<GetRoomAvailabilityRequest> getRoomAvailabilityRequestValidator,
+        IValidator<GetOccupiedHoursRequest> getOccupiedHoursRequestValidator,
         ITimeZoneConverter timeZoneConverter) : IMeetingRoomService
     {
         public async Task<ResponseWrapper<int>> Create(CreateMeetingRoomRequest request, CancellationToken cancellationToken)
@@ -296,6 +297,39 @@ namespace HotelBooking.Services
                 (int)HttpStatusCode.OK,
                 "Availability retrieved successfully.",
                 availableSlots);
+        }
+
+        public async Task<ResponseWrapper<List<TimeSlotResponse>>> GetOccupiedHours(int roomId, GetOccupiedHoursRequest request, CancellationToken cancellationToken)
+        {
+            await getOccupiedHoursRequestValidator.ValidateAndThrowAsync(request, cancellationToken);
+
+            var room = await roomRepository.GetActiveById(roomId, cancellationToken);
+            if (room is null)
+            {
+                return new ResponseWrapper<List<TimeSlotResponse>>(
+                    false,
+                    (int)HttpStatusCode.NotFound,
+                    "Meeting room not found or is not active.",
+                    default);
+            }
+
+            var windowStartUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(request.FromTime), request.TimeZoneId);
+            var windowEndUtc = timeZoneConverter.ConvertToUtc(request.Date.ToDateTime(request.ToTime), request.TimeZoneId);
+
+            var confirmedBookings = await bookingRepository.GetConfirmedBookingsInRange(roomId, windowStartUtc, windowEndUtc, cancellationToken);
+
+            var occupiedHours = confirmedBookings
+                .Select(booking => new TimeSlotResponse(
+                    TimeOnly.FromDateTime(timeZoneConverter.ConvertFromUtc(booking.StartUtc, request.TimeZoneId)),
+                    TimeOnly.FromDateTime(timeZoneConverter.ConvertFromUtc(booking.EndUtc, request.TimeZoneId))))
+                .OrderBy(slot => slot.StartTime)
+                .ToList();
+
+            return new ResponseWrapper<List<TimeSlotResponse>>(
+                true,
+                (int)HttpStatusCode.OK,
+                "Occupied hours retrieved successfully.",
+                occupiedHours);
         }
     }
 }

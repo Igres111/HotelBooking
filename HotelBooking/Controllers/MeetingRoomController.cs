@@ -121,6 +121,35 @@ namespace HotelBooking.Controllers
         }
 
         /// <summary>
+        /// Retrieves the occupied hours for a room on a given date, within a given time window.
+        /// </summary>
+        /// <remarks>
+        /// Employee or Administrator role required.
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/meetingroom/1/occupied-hours?date=2026-09-20&amp;fromTime=09:00&amp;toTime=18:00&amp;timeZoneId=Asia/Tbilisi
+        ///
+        /// date, fromTime, toTime, and timeZoneId are interpreted together as a local time window;
+        /// returned time ranges are also local to timeZoneId. Only Confirmed bookings that overlap
+        /// the window are returned - Pending, Rejected, and Cancelled bookings are never occupying.
+        /// </remarks>
+        /// <response code="200">Occupied hours retrieved successfully.</response>
+        /// <response code="400">Validation failed.</response>
+        /// <response code="404">Meeting room not found or is not active.</response>
+        [HttpGet("{id}/occupied-hours")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseWrapper<List<TimeSlotResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseWrapper<List<TimeSlotResponse>>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetOccupiedHours([FromRoute] int id, [FromQuery] GetOccupiedHoursRequest request, CancellationToken cancellationToken)
+        {
+            var response = await _meetingRoomService.GetOccupiedHours(id, request, cancellationToken);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
         /// Updates a meeting room. Any field may be omitted (or null) to leave it unchanged.
         /// </summary>
         /// <remarks>
