@@ -55,6 +55,10 @@ builder.Services.AddHttpClient<IBookingApiClient, BookingApiClient>(client =>
 
 builder.Services.AddScoped<IValidator<SignUpViewModel>, SignUpViewModelValidator>();
 builder.Services.AddScoped<IValidator<LoginViewModel>, LoginViewModelValidator>();
+builder.Services.AddScoped<IValidator<CreateMeetingRoomViewModel>, CreateMeetingRoomViewModelValidator>();
+builder.Services.AddScoped<IValidator<UpdateMeetingRoomViewModel>, UpdateMeetingRoomViewModelValidator>();
+builder.Services.AddScoped<IValidator<BookTimeSlotViewModel>, BookTimeSlotViewModelValidator>();
+builder.Services.AddScoped<IValidator<CreateRecurringBookingViewModel>, CreateRecurringBookingViewModelValidator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -69,6 +73,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
         options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Home/AccessDenied";
     });
 
 var app = builder.Build();

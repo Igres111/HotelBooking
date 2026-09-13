@@ -40,6 +40,20 @@ namespace HotelBooking.Web.ApiClients
             return await ApiResponseHelper.ParseResponse<PagedResult<BookingResponse>>(response, cancellationToken);
         }
 
+        public async Task<ResponseWrapper<List<BookingResponse>>> GetAllForAdmin(CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync("api/booking/admin", cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<List<BookingResponse>>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<BookingResponse>> GetById(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync($"api/booking/{id}", cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<int>> Create(CreateBookingRequest request, CancellationToken cancellationToken)
         {
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/booking")
@@ -69,6 +83,20 @@ namespace HotelBooking.Web.ApiClients
         public async Task<ResponseWrapper<BookingResponse>> Cancel(int id, CancellationToken cancellationToken)
         {
             var response = await httpClient.PostAsync($"api/booking/{id}/cancel", null, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<BookingResponse>> Confirm(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PostAsync($"api/booking/{id}/confirm", null, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<BookingResponse>> Reject(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PostAsync($"api/booking/{id}/reject", null, cancellationToken);
 
             return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
         }

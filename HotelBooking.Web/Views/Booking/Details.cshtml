@@ -1,0 +1,59 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model HotelBooking.Web.Models.Responses.BookingResponse
+
+@using HotelBooking.Web.Models.Enums
+@{
+    ViewData["Title"] = "Booking Details";
+    var displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tbilisi");
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<h1>Booking Details</h1>
+<p><a asp-controller="Booking" asp-action="Index">&larr; Back to My Bookings</a></p>
+
+<dl class="row" style="max-width: 500px;">
+    <dt class="col-sm-4">Booking Id</dt>
+    <dd class="col-sm-8">@Model.Id</dd>
+
+    <dt class="col-sm-4">Room</dt>
+    <dd class="col-sm-8">@Model.RoomName</dd>
+
+    <dt class="col-sm-4">Booked By</dt>
+    <dd class="col-sm-8">@Model.UserFullName</dd>
+
+    <dt class="col-sm-4">Start Time</dt>
+    <dd class="col-sm-8">@TimeZoneInfo.ConvertTimeFromUtc(Model.StartUtc, displayTimeZone).ToString("g")</dd>
+
+    <dt class="col-sm-4">End Time</dt>
+    <dd class="col-sm-8">@TimeZoneInfo.ConvertTimeFromUtc(Model.EndUtc, displayTimeZone).ToString("g")</dd>
+
+    <dt class="col-sm-4">Attendees</dt>
+    <dd class="col-sm-8">@Model.AttendeeCount</dd>
+
+    <dt class="col-sm-4">Notes</dt>
+    <dd class="col-sm-8">@Model.Notes</dd>
+
+    <dt class="col-sm-4">Status</dt>
+    <dd class="col-sm-8">@Model.Status</dd>
+</dl>
+
+<div class="d-flex gap-2">
+    @if (Model.Status == BookingStatus.Pending && User.IsInRole("Administrator"))
+    {
+        <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn btn-success">Confirm</button>
+        </form>
+        <form asp-controller="Booking" asp-action="Reject" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn btn-warning">Reject</button>
+        </form>
+    }
+    @if (Model.Status == BookingStatus.Pending || Model.Status == BookingStatus.Confirmed)
+    {
+        <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn btn-danger">Cancel Booking</button>
+        </form>
+    }
+</div>

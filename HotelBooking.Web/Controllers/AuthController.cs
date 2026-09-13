@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HotelBooking.Web.Handlers;
+using HotelBooking.Web.Models.Enums;
 using HotelBooking.Web.Models.ViewModels;
 using HotelBooking.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
@@ -48,6 +49,11 @@ namespace HotelBooking.Web.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return DefaultLandingPage(User.IsInRole(nameof(UserRole.Administrator)));
+            }
+
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
@@ -90,7 +96,12 @@ namespace HotelBooking.Web.Controllers
                 return Redirect(model.ReturnUrl);
             }
 
-            return RedirectToAction("Index", "Home");
+            return DefaultLandingPage(user.Role == UserRole.Administrator);
+        }
+
+        private IActionResult DefaultLandingPage(bool isAdmin)
+        {
+            return isAdmin ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Booking");
         }
 
         [HttpPost]

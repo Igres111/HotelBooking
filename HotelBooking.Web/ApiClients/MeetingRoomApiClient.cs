@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using HotelBooking.Web.ApiClients.Interfaces;
 using HotelBooking.Web.Helpers;
 using HotelBooking.Web.Models.Requests;
@@ -8,6 +9,20 @@ namespace HotelBooking.Web.ApiClients
 {
     public class MeetingRoomApiClient(HttpClient httpClient) : IMeetingRoomApiClient
     {
+        public async Task<ResponseWrapper<int>> Create(CreateMeetingRoomRequest request, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PostAsJsonAsync("api/meetingroom", request, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<int>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<MeetingRoomsResponse>> Update(int id, UpdateMeetingRoomRequest request, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.PutAsJsonAsync($"api/meetingroom/{id}", request, cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<MeetingRoomsResponse>(response, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<PagedResult<MeetingRoomsResponse>>> GetAllActive(GetMeetingRoomsRequest request, CancellationToken cancellationToken)
         {
             var queryParams = new Dictionary<string, string?>
@@ -65,6 +80,20 @@ namespace HotelBooking.Web.ApiClients
             var response = await httpClient.GetAsync(url, cancellationToken);
 
             return await ApiResponseHelper.ParseResponse<List<TimeSlotResponse>>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<List<MeetingRoomsResponse>>> GetAllForAdmin(CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync("api/meetingroom/admin", cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<List<MeetingRoomsResponse>>(response, cancellationToken);
+        }
+
+        public async Task<ResponseWrapper<MeetingRoomsResponse>> GetByIdForAdmin(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync($"api/meetingroom/admin/{id}", cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<MeetingRoomsResponse>(response, cancellationToken);
         }
     }
 }

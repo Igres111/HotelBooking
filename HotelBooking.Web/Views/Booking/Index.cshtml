@@ -84,7 +84,7 @@
                         @foreach (var booking in Model.Bookings.Items)
                         {
                             <tr>
-                                <td>@booking.RoomName</td>
+                                <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>
@@ -147,7 +147,7 @@
                         @foreach (var booking in Model.RecurringBookings.Items)
                         {
                             <tr>
-                                <td>@booking.RoomName</td>
+                                <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>

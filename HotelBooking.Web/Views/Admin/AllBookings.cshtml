@@ -1,0 +1,67 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using HotelBooking.Web.Models.Enums
+@model List<HotelBooking.Web.Models.Responses.BookingResponse>
+
+@{
+    ViewData["Title"] = "All Bookings";
+    var displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tbilisi");
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<h1>All Bookings</h1>
+
+@if (Model.Count == 0)
+{
+    <p>No bookings found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Booked By</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Attendees</th>
+                <th>Notes</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
+                    <td>@booking.UserFullName</td>
+                    <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
+                    <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
+                    <td>@booking.AttendeeCount</td>
+                    <td>@booking.Notes</td>
+                    <td>@booking.Status</td>
+                    <td class="d-flex gap-2">
+                        @if (booking.Status == BookingStatus.Pending)
+                        {
+                            <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                            </form>
+                            <form asp-controller="Booking" asp-action="Reject" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                            </form>
+                        }
+                        @if (booking.Status == BookingStatus.Pending || booking.Status == BookingStatus.Confirmed)
+                        {
+                            <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

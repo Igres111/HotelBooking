@@ -81,11 +81,11 @@ else
                     <input type="hidden" name="TimeZoneId" id="bookSlotTimeZoneId" />
                     <div class="mb-3">
                         <label class="form-label">Attendees</label>
-                        <input type="number" name="AttendeeCount" class="form-control" min="1" max="@Model.RoomCapacity" value="1" required />
+                        <input type="number" name="AttendeeCount" class="form-control" value="1" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Notes</label>
-                        <textarea name="Notes" class="form-control" rows="3" maxlength="500"></textarea>
+                        <textarea name="Notes" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -113,15 +113,15 @@ else
                     <input type="hidden" name="TimeZoneId" id="recurTimeZoneId" />
                     <div class="mb-3">
                         <label class="form-label">Attendees</label>
-                        <input type="number" name="AttendeeCount" class="form-control" min="1" max="@Model.RoomCapacity" value="1" required />
+                        <input type="number" name="AttendeeCount" class="form-control" value="1" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Notes</label>
-                        <textarea name="Notes" class="form-control" rows="3" maxlength="500"></textarea>
+                        <textarea name="Notes" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Number of weekly occurrences</label>
-                        <input type="number" name="OccurrenceCount" class="form-control" min="1" max="4" value="4" required />
+                        <input type="number" name="OccurrenceCount" class="form-control" value="4" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -134,25 +134,5 @@ else
 </div>
 
 @section Scripts {
-    <script>
-        document.getElementById('bookSlotModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            document.getElementById('bookSlotRoomId').value = button.getAttribute('data-room-id');
-            document.getElementById('bookSlotDate').value = button.getAttribute('data-date');
-            document.getElementById('bookSlotStartTime').value = button.getAttribute('data-start-time');
-            document.getElementById('bookSlotEndTime').value = button.getAttribute('data-end-time');
-            document.getElementById('bookSlotTimeZoneId').value = button.getAttribute('data-time-zone-id');
-            document.getElementById('bookSlotLabel').textContent = button.getAttribute('data-label');
-        });
-
-        document.getElementById('createRecurringModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            document.getElementById('recurRoomId').value = button.getAttribute('data-room-id');
-            document.getElementById('recurStartDate').value = button.getAttribute('data-date');
-            document.getElementById('recurStartTime').value = button.getAttribute('data-start-time');
-            document.getElementById('recurEndTime').value = button.getAttribute('data-end-time');
-            document.getElementById('recurTimeZoneId').value = button.getAttribute('data-time-zone-id');
-            document.getElementById('recurSlotLabel').textContent = button.getAttribute('data-label');
-        });
-    </script>
+    <script src="~/js/availability.js" asp-append-version="true"></script>
 }
