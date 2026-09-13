@@ -5,15 +5,19 @@
     ViewData["Title"] = "Room Details";
 }
 
-<div class="d-flex align-items-center gap-2 mb-3">
-    <h1 class="mb-0">Room Details</h1>
-    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRoomModal">
-        Edit
-    </button>
-</div>
-<p><a asp-controller="Admin" asp-action="AllRooms">&larr; Back to All Rooms</a></p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-rooms.css" asp-append-version="true" />
+}
 
-<dl class="row" style="max-width: 500px;">
+<a asp-controller="Admin" asp-action="AllRooms" class="back-link">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Back to All Rooms
+</a>
+
+<div class="availability-page">
+<h1>Room Details</h1>
+
+<dl class="row detail-list">
     <dt class="col-sm-4">Room Id</dt>
     <dd class="col-sm-8">@Model.Id</dd>
 
@@ -36,8 +40,13 @@
     <dd class="col-sm-8">@Model.ClosingTime</dd>
 
     <dt class="col-sm-4">Active</dt>
-    <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
+    <dd class="col-sm-8"><span class="status-badge @(Model.IsActive ? "status-badge-confirmed" : "status-badge-cancelled")">@(Model.IsActive ? "Yes" : "No")</span></dd>
 </dl>
+
+<button type="button" class="btn btn-warning edit-room-btn mt-3" data-bs-toggle="modal" data-bs-target="#editRoomModal">
+    Edit
+</button>
+</div>
 
 <div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog">

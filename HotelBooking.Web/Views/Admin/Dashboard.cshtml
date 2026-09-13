@@ -6,10 +6,16 @@
     var monthNames = System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat.MonthNames;
 }
 
-<h1>Dashboard</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
 
-<div class="row">
-    <div class="col-md-6">
+<h1 class="mb-3">Dashboard</h1>
+
+<div class="dashboard-row">
+    <div class="dashboard-panel">
+        <h2>Booking Overview</h2>
+
         <form asp-controller="Admin" asp-action="Dashboard" method="get" class="row g-2 mb-3">
             <input type="hidden" name="roomId" value="@Model.RoomId" />
             <input type="hidden" name="date" value="@Model.UtilizationDate.ToString("yyyy-MM-dd")" />
@@ -33,36 +39,53 @@
             </div>
         </form>
 
-        <dl class="row" style="max-width: 500px;">
-            <dt class="col-sm-6">Total Bookings</dt>
-            <dd class="col-sm-6">@Model.TotalBookings</dd>
+        <div class="dashboard-stats">
+            <div class="stat-tile stat-tile-total">
+                <div class="stat-tile-value">@Model.TotalBookings</div>
+                <div class="stat-tile-label">Total Bookings</div>
+                <div class="stat-tile-caption">All reservations</div>
+            </div>
+            <div class="stat-tile stat-tile-pending">
+                <div class="stat-tile-value">@Model.PendingBookings</div>
+                <div class="stat-tile-label">Pending Bookings</div>
+                <div class="stat-tile-caption">Awaiting confirmation</div>
+            </div>
+            <div class="stat-tile stat-tile-confirmed">
+                <div class="stat-tile-value">@Model.ConfirmedBookings</div>
+                <div class="stat-tile-label">Confirmed Bookings</div>
+                <div class="stat-tile-caption">Approved reservations</div>
+            </div>
+            <div class="stat-tile stat-tile-cancelled">
+                <div class="stat-tile-value">@Model.CancelledBookings</div>
+                <div class="stat-tile-label">Cancelled Bookings</div>
+                <div class="stat-tile-caption">Cancelled reservations</div>
+            </div>
+        </div>
 
-            <dt class="col-sm-6">Pending Bookings</dt>
-            <dd class="col-sm-6">@Model.PendingBookings</dd>
+        <div class="dashboard-section-title">Booking Statistics</div>
 
-            <dt class="col-sm-6">Confirmed Bookings</dt>
-            <dd class="col-sm-6">@Model.ConfirmedBookings</dd>
-
-            <dt class="col-sm-6">Cancelled Bookings</dt>
-            <dd class="col-sm-6">@Model.CancelledBookings</dd>
-        </dl>
-
-        <div style="max-width: 600px;">
+        <div class="chart-container">
             <canvas id="statisticsChart"
                     data-total="@Model.TotalBookings"
                     data-confirmed="@Model.ConfirmedBookings"
                     data-cancelled="@Model.CancelledBookings"></canvas>
         </div>
 
-        <a asp-controller="Admin" asp-action="ExportBookings" download class="btn btn-success mt-3">Export booking data to CSV.</a>
+        <a asp-controller="Admin" asp-action="ExportBookings" download class="export-csv-btn mt-3">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export booking data to CSV
+        </a>
     </div>
 
-    <div class="col-md-6">
-        <h2 class="h4">Room Utilization</h2>
+    <div class="dashboard-panel">
+        <h2>Room Utilization</h2>
 
         @if (Model.Rooms.Count == 0)
         {
-            <p>No active rooms available.</p>
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <p>No active rooms available</p>
+            </div>
         }
         else
         {
@@ -97,11 +120,15 @@
 
             @if (Model.OccupiedSlots.Count == 0)
             {
-                <p>No confirmed bookings in this window.</p>
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <p>No booking details to display</p>
+                    <p class="empty-state-hint">Select a room, date and time range, then click Apply to view room utilization details.</p>
+                </div>
             }
             else
             {
-                <ul class="list-group" style="max-width: 300px;">
+                <ul class="list-group occupied-slots-list">
                     @foreach (var slot in Model.OccupiedSlots)
                     {
                         <li class="list-group-item">@slot.StartTime - @slot.EndTime</li>

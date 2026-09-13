@@ -13,54 +13,60 @@
 
 @if (Model.Rooms is null || Model.Rooms.Items.Count == 0)
 {
-    <p>No rooms found.</p>
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 16s-1.5-2-4-2-4 2-4 2"></path></svg>
+        <p>No rooms found</p>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
-                       asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
-                       asp-route-sortby="name" asp-route-sortdescending="@NextDirection("name")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
-                        Name@(SortIndicator("name"))
-                    </a>
-                </th>
-                <th>
-                    <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
-                       asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
-                       asp-route-sortby="location" asp-route-sortdescending="@NextDirection("location")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
-                        Location@(SortIndicator("location"))
-                    </a>
-                </th>
-                <th>
-                    <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
-                       asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
-                       asp-route-sortby="capacity" asp-route-sortdescending="@NextDirection("capacity")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
-                        Capacity@(SortIndicator("capacity"))
-                    </a>
-                </th>
-                <th>Opening Time</th>
-                <th>Closing Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var room in Model.Rooms.Items)
-            {
-                <tr>
-                    <td><a asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@room.Id">@room.Name</a></td>
-                    <td>@room.Location</td>
-                    <td>@room.Capacity</td>
-                    <td>@room.OpeningTime</td>
-                    <td>@room.ClosingTime</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="room-sort-bar">
+        <span>Sort by:</span>
+        <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
+           asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
+           asp-route-sortby="name" asp-route-sortdescending="@NextDirection("name")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
+            Name@(SortIndicator("name"))
+        </a>
+        <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
+           asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
+           asp-route-sortby="location" asp-route-sortdescending="@NextDirection("location")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
+            Location@(SortIndicator("location"))
+        </a>
+        <a class="room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
+           asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"
+           asp-route-sortby="capacity" asp-route-sortdescending="@NextDirection("capacity")" asp-route-page="1" asp-route-pagesize="@Model.Rooms.PageSize">
+            Capacity@(SortIndicator("capacity"))
+        </a>
+    </div>
+
+    <div class="room-list">
+        @foreach (var room in Model.Rooms.Items)
+        {
+            <div class="room-card">
+                <div class="room-card-info">
+                    <div class="room-card-name">
+                        <a asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@room.Id">@room.Name</a>
+                        <span class="room-card-id">#@room.Id</span>
+                    </div>
+                    <div class="room-card-location">@room.Location</div>
+                </div>
+                <div class="room-card-attr">
+                    <span class="attr-label">Capacity</span>
+                    <span class="attr-value">@room.Capacity people</span>
+                </div>
+                <div class="room-card-attr">
+                    <span class="attr-label">Hours</span>
+                    <span class="attr-value">@room.OpeningTime - @room.ClosingTime</span>
+                </div>
+                <div class="room-card-actions">
+                    <a class="btn btn-primary btn-sm" asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@room.Id">View Availability</a>
+                </div>
+            </div>
+        }
+    </div>
 
     <nav>
-        <ul class="pagination">
+        <ul class="pagination mt-3">
             <li class="page-item @(Model.Rooms.Page <= 1 ? "disabled" : "")">
                 <a class="page-link room-catalog-ajax-link" asp-controller="MeetingRoom" asp-action="Index"
                    asp-route-name="@Model.Name" asp-route-location="@Model.Location" asp-route-mincapacity="@Model.MinCapacity"

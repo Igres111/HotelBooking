@@ -5,61 +5,72 @@
     ViewData["Title"] = "All Rooms";
 }
 
-<div class="d-flex align-items-center gap-2 mb-3">
-    <h1 class="mb-0">All Rooms</h1>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRoomModal">
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-rooms.css" asp-append-version="true" />
+}
+
+<div class="admin-rooms-header">
+    <h1>All Rooms</h1>
+    <button type="button" class="btn btn-primary create-room-btn" data-bs-toggle="modal" data-bs-target="#createRoomModal">
         + Create a new room
     </button>
 </div>
 
 @if (Model.Count == 0)
 {
-    <p>No rooms found.</p>
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 16s-1.5-2-4-2-4 2-4 2"></path></svg>
+        <p>No rooms found</p>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Location</th>
-                <th>Capacity</th>
-                <th>Opening Time</th>
-                <th>Closing Time</th>
-                <th>Active</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var room in Model)
-            {
+    <div class="admin-rooms-card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><a asp-controller="Admin" asp-action="RoomDetails" asp-route-id="@room.Id">@room.Name</a></td>
-                    <td>@room.Description</td>
-                    <td>@room.Location</td>
-                    <td>@room.Capacity</td>
-                    <td>@room.OpeningTime</td>
-                    <td>@room.ClosingTime</td>
-                    <td>@(room.IsActive ? "Yes" : "No")</td>
-                    <td>
-                        <button type="button" class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#editRoomModal"
-                                data-room-id="@room.Id"
-                                data-name="@room.Name"
-                                data-description="@room.Description"
-                                data-location="@room.Location"
-                                data-capacity="@room.Capacity"
-                                data-opening-time="@room.OpeningTime.ToString("HH:mm")"
-                                data-closing-time="@room.ClosingTime.ToString("HH:mm")"
-                                data-is-active="@room.IsActive.ToString().ToLower()">
-                            Edit
-                        </button>
-                    </td>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Opening Time</th>
+                    <th>Closing Time</th>
+                    <th>Active</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var room in Model)
+                {
+                    <tr>
+                        <td><a asp-controller="Admin" asp-action="RoomDetails" asp-route-id="@room.Id">@room.Name</a></td>
+                        <td>@room.Description</td>
+                        <td>@room.Location</td>
+                        <td>@room.Capacity</td>
+                        <td>@room.OpeningTime</td>
+                        <td>@room.ClosingTime</td>
+                        <td><span class="status-badge @(room.IsActive ? "status-badge-confirmed" : "status-badge-cancelled")">@(room.IsActive ? "Yes" : "No")</span></td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm edit-room-btn"
+                                    data-bs-toggle="modal" data-bs-target="#editRoomModal"
+                                    data-room-id="@room.Id"
+                                    data-name="@room.Name"
+                                    data-description="@room.Description"
+                                    data-location="@room.Location"
+                                    data-capacity="@room.Capacity"
+                                    data-opening-time="@room.OpeningTime.ToString("HH:mm")"
+                                    data-closing-time="@room.ClosingTime.ToString("HH:mm")"
+                                    data-is-active="@room.IsActive.ToString().ToLower()">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    </div>
 }
 
 <div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">

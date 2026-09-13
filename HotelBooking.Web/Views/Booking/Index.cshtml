@@ -15,6 +15,15 @@
 
     string SortIndicator(string column) => IsSortedBy(column) ? (Model.SortDescending ? " ▼" : " ▲") : "";
 
+    string StatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "status-badge-pending",
+        BookingStatus.Confirmed => "status-badge-confirmed",
+        BookingStatus.Rejected => "status-badge-rejected",
+        BookingStatus.Cancelled => "status-badge-cancelled",
+        _ => ""
+    };
+
     async Task RenderCancelForm(BookingResponse booking)
     {
         if (booking.Status == BookingStatus.Pending || booking.Status == BookingStatus.Confirmed)
@@ -23,35 +32,43 @@
                 <button type="submit" class="btn btn-link text-danger p-0">Cancel</button>
             </form>
         }
+        else
+        {
+            <span>-</span>
+        }
         await Task.CompletedTask;
     }
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+}
+
 <h1>My Bookings</h1>
 
-<form asp-controller="Booking" asp-action="Index" method="get" class="row g-2 mb-3">
-    <div class="col-auto">
-        <select name="Status" class="form-select">
-            <option value="">All statuses</option>
-            @foreach (var status in Enum.GetValues<BookingStatus>())
-            {
-                <option value="@status" selected="@(Model.Status == status)">@status</option>
-            }
-        </select>
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a asp-controller="Booking" asp-action="Index" class="btn btn-outline-secondary">Clear</a>
-    </div>
+<form asp-controller="Booking" asp-action="Index" method="get" class="bookings-search-bar">
+    <select name="Status" class="form-select">
+        <option value="">All statuses</option>
+        @foreach (var status in Enum.GetValues<BookingStatus>())
+        {
+            <option value="@status" selected="@(Model.Status == status)">@status</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a asp-controller="Booking" asp-action="Index" class="btn btn-outline-secondary">Clear</a>
 </form>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 mb-3">
+      <div class="bookings-card">
         <h4>Individual Bookings</h4>
 
         @if (Model.Bookings is null || Model.Bookings.Items.Count == 0)
         {
-            <p>No bookings found.</p>
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <p>No bookings found</p>
+            </div>
         }
         else
         {
@@ -89,7 +106,7 @@
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>
                                 <td>@booking.Notes</td>
-                                <td>@booking.Status</td>
+                                <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
                                 <td>@{ await RenderCancelForm(booking); }</td>
                             </tr>
                         }
@@ -119,14 +136,19 @@
                 </ul>
             </nav>
         }
+      </div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-6 mb-3">
+      <div class="bookings-card">
         <h4>Recurring Bookings</h4>
 
         @if (Model.RecurringBookings is null || Model.RecurringBookings.Items.Count == 0)
         {
-            <p>No recurring bookings found.</p>
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <p>No recurring bookings found</p>
+            </div>
         }
         else
         {
@@ -152,7 +174,7 @@
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>
                                 <td>@booking.Notes</td>
-                                <td>@booking.Status</td>
+                                <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
                                 <td>@{ await RenderCancelForm(booking); }</td>
                             </tr>
                         }
@@ -160,5 +182,6 @@
                 </table>
             </div>
         }
+      </div>
     </div>
 </div>

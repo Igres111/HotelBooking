@@ -14,3 +14,21 @@
         }
     });
 })();
+
+(function () {
+    var toggle = document.getElementById('sidebarToggle');
+    var sidebar = document.getElementById('sidebar');
+    if (!toggle || !sidebar) {
+        return;
+    }
+
+    toggle.addEventListener('click', function () {
+        sidebar.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && !toggle.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+})();

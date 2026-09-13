@@ -6,54 +6,122 @@
     ViewData["Title"] = "Booking Details";
     var displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tbilisi");
     var returnUrl = Context.Request.Path + Context.Request.QueryString;
+
+    string StatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "status-badge-pending",
+        BookingStatus.Confirmed => "status-badge-confirmed",
+        BookingStatus.Rejected => "status-badge-rejected",
+        BookingStatus.Cancelled => "status-badge-cancelled",
+        _ => ""
+    };
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+}
+
+<a asp-controller="Booking" asp-action="Index" class="back-link">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Back to My Bookings
+</a>
+
+<div class="availability-page">
 <h1>Booking Details</h1>
-<p><a asp-controller="Booking" asp-action="Index">&larr; Back to My Bookings</a></p>
 
-<dl class="row" style="max-width: 500px;">
-    <dt class="col-sm-4">Booking Id</dt>
-    <dd class="col-sm-8">@Model.Id</dd>
+<div class="detail-rows">
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+        </div>
+        <div class="detail-row-label">Booking Id</div>
+        <div class="detail-row-value">@Model.Id</div>
+    </div>
 
-    <dt class="col-sm-4">Room</dt>
-    <dd class="col-sm-8">@Model.RoomName</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1"></rect><circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"></circle></svg>
+        </div>
+        <div class="detail-row-label">Room</div>
+        <div class="detail-row-value"><a asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@Model.RoomId">@Model.RoomName</a></div>
+    </div>
 
-    <dt class="col-sm-4">Booked By</dt>
-    <dd class="col-sm-8">@Model.UserFullName</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="detail-row-label">Booked By</div>
+        <div class="detail-row-value">@Model.UserFullName</div>
+    </div>
 
-    <dt class="col-sm-4">Start Time</dt>
-    <dd class="col-sm-8">@TimeZoneInfo.ConvertTimeFromUtc(Model.StartUtc, displayTimeZone).ToString("g")</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <div class="detail-row-label">Start Time</div>
+        <div class="detail-row-value">@TimeZoneInfo.ConvertTimeFromUtc(Model.StartUtc, displayTimeZone).ToString("g")</div>
+    </div>
 
-    <dt class="col-sm-4">End Time</dt>
-    <dd class="col-sm-8">@TimeZoneInfo.ConvertTimeFromUtc(Model.EndUtc, displayTimeZone).ToString("g")</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <div class="detail-row-label">End Time</div>
+        <div class="detail-row-value">@TimeZoneInfo.ConvertTimeFromUtc(Model.EndUtc, displayTimeZone).ToString("g")</div>
+    </div>
 
-    <dt class="col-sm-4">Attendees</dt>
-    <dd class="col-sm-8">@Model.AttendeeCount</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <div class="detail-row-label">Attendees</div>
+        <div class="detail-row-value">@Model.AttendeeCount</div>
+    </div>
 
-    <dt class="col-sm-4">Notes</dt>
-    <dd class="col-sm-8">@Model.Notes</dd>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
+        <div class="detail-row-label">Notes</div>
+        <div class="detail-row-value">@(string.IsNullOrEmpty(Model.Notes) ? "-" : Model.Notes)</div>
+    </div>
 
-    <dt class="col-sm-4">Status</dt>
-    <dd class="col-sm-8">@Model.Status</dd>
-</dl>
+    <div class="detail-row">
+        <div class="detail-row-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <div class="detail-row-label">Status</div>
+        <div class="detail-row-value"><span class="status-badge @StatusBadgeClass(Model.Status)">@Model.Status</span></div>
+    </div>
+</div>
 
-<div class="d-flex gap-2">
+<div class="d-flex gap-2 mt-3 justify-content-center">
     @if (Model.Status == BookingStatus.Pending && User.IsInRole("Administrator"))
     {
-        <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@Model.Id" method="post">
+        <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@Model.Id" method="post" class="d-inline">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
-            <button type="submit" class="btn btn-success">Confirm</button>
+            <button type="submit" class="btn-confirm-action btn-lg-action">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Confirm
+            </button>
         </form>
-        <form asp-controller="Booking" asp-action="Reject" asp-route-id="@Model.Id" method="post">
+        <form asp-controller="Booking" asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
-            <button type="submit" class="btn btn-warning">Reject</button>
+            <button type="submit" class="btn-reject-action btn-lg-action">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Reject
+            </button>
         </form>
     }
     @if (Model.Status == BookingStatus.Pending || Model.Status == BookingStatus.Confirmed)
     {
-        <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@Model.Id" method="post">
+        <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
-            <button type="submit" class="btn btn-danger">Cancel Booking</button>
+            <button type="submit" class="btn-cancel-action btn-lg-action">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Cancel Booking
+            </button>
         </form>
     }
+</div>
 </div>

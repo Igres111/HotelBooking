@@ -1,0 +1,119 @@
+.dashboard-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.dashboard-panel {
+  background: #fff;
+  border: 1px solid #edf0f3;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  flex: 1 1 480px;
+}
+
+.dashboard-panel h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+}
+
+.dashboard-panel .row.g-2 {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-tile {
+  border-radius: 0.85rem;
+  padding: 1rem 1.1rem;
+}
+
+.stat-tile-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.1;
+}
+
+.stat-tile-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #343a40;
+  margin-top: 0.25rem;
+}
+
+.stat-tile-caption {
+  font-size: 0.75rem;
+  color: #868e96;
+  margin-top: 0.35rem;
+}
+
+.stat-tile-total {
+  background: #e7f1ff;
+}
+
+.stat-tile-pending {
+  background: #fff6df;
+}
+
+.stat-tile-confirmed {
+  background: #e4f9ec;
+}
+
+.stat-tile-cancelled {
+  background: #fde6e6;
+}
+
+.stat-tile-cancelled .stat-tile-value {
+  color: #e03131;
+}
+
+.dashboard-section-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.chart-container {
+  max-width: 600px;
+}
+
+.export-csv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(46, 204, 113, 0.35);
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  text-decoration: none;
+}
+
+.export-csv-btn:hover {
+  background: #29b765;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(46, 204, 113, 0.45);
+}
+
+.occupied-slots-list {
+  max-width: 300px;
+}

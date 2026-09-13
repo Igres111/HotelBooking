@@ -5,22 +5,21 @@
     ViewData["Title"] = "Room Catalog";
 }
 
-<h1>Room Catalog</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/room-catalog.css" asp-append-version="true" />
+}
 
-<form id="roomSearchForm" asp-controller="MeetingRoom" asp-action="Index" method="get" class="row g-2 mb-3">
-    <div class="col-auto">
-        <input type="text" name="Name" value="@Model.Name" class="form-control" placeholder="Search by name" />
-    </div>
-    <div class="col-auto">
-        <input type="text" name="Location" value="@Model.Location" class="form-control" placeholder="Location" />
-    </div>
-    <div class="col-auto">
-        <input type="number" name="MinCapacity" value="@Model.MinCapacity" class="form-control" placeholder="Min capacity" min="1" />
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a asp-controller="MeetingRoom" asp-action="Index" class="btn btn-outline-secondary room-catalog-ajax-link">Clear</a>
-    </div>
+<div class="room-catalog-header">
+    <h1>Room Catalog</h1>
+</div>
+
+<form id="roomSearchForm" asp-controller="MeetingRoom" asp-action="Index" method="get" class="room-search-bar mb-3">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" name="Name" value="@Model.Name" placeholder="Search by name" />
+    <input type="text" name="Location" value="@Model.Location" placeholder="Location" />
+    <input type="number" name="MinCapacity" value="@Model.MinCapacity" placeholder="Min capacity" min="1" />
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    <a asp-controller="MeetingRoom" asp-action="Index" class="btn btn-outline-secondary btn-sm room-catalog-ajax-link">Clear</a>
 </form>
 
 <div id="roomResults">
