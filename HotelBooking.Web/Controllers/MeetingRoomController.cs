@@ -28,6 +28,11 @@ namespace HotelBooking.Web.Controllers
                 SortDescending = request.SortDescending
             };
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_RoomCatalogResults", viewModel);
+            }
+
             return View(viewModel);
         }
 
