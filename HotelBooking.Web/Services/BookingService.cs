@@ -27,6 +27,11 @@ namespace HotelBooking.Web.Services
             return await bookingApiClient.GetById(id, cancellationToken);
         }
 
+        public async Task<ResponseWrapper<List<BookingStatusHistoryResponse>>> GetHistory(int id, CancellationToken cancellationToken)
+        {
+            return await bookingApiClient.GetHistory(id, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<int>> Create(CreateBookingRequest request, CancellationToken cancellationToken)
         {
             return await bookingApiClient.Create(request, cancellationToken);

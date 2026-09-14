@@ -15,7 +15,7 @@
 </a>
 
 <div class="availability-page">
-<h1>@Model.RoomName</h1>
+<h1>@Model.RoomName <span class="room-capacity-inline">(Capacity - @Model.RoomCapacity)</span></h1>
 
 <form id="availabilityForm" asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@Model.RoomId" method="get" class="row g-2 mb-3 justify-content-center">
     <input type="hidden" name="timeZoneId" value="@Model.TimeZoneId" />

@@ -1,0 +1,89 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using HotelBooking.Web.Models.Enums
+@model List<HotelBooking.Web.Models.Responses.BookingResponse>
+
+@{
+    ViewData["Title"] = "Booking History";
+    var displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tbilisi");
+
+    string StatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "status-badge-pending",
+        BookingStatus.Confirmed => "status-badge-confirmed",
+        BookingStatus.Rejected => "status-badge-rejected",
+        BookingStatus.Cancelled => "status-badge-cancelled",
+        _ => ""
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+}
+
+<h1 class="mb-3">Booking History</h1>
+
+<div class="bookings-card">
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <p>No bookings found</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Booked By</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td>@booking.RoomName</td>
+                        <td>@booking.UserFullName</td>
+                        <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
+                        <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
+                        <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
+                        <td>
+                            <button type="button" class="btn-history-action" data-booking-id="@booking.Id" data-bs-toggle="modal" data-bs-target="#bookingHistoryModal">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                View History
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+</div>
+
+<div class="modal fade" id="bookingHistoryModal" tabindex="-1" aria-labelledby="bookingHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingHistoryModalLabel">Booking History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bookingHistoryModalBody">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/booking-history.js" asp-append-version="true"></script>
+}

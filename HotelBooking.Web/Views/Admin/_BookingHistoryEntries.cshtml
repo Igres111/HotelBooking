@@ -1,0 +1,49 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using HotelBooking.Web.Models.Enums
+@model List<HotelBooking.Web.Models.Responses.BookingStatusHistoryResponse>
+
+@{
+    var displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tbilisi");
+
+    string StatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "status-badge-pending",
+        BookingStatus.Confirmed => "status-badge-confirmed",
+        BookingStatus.Rejected => "status-badge-rejected",
+        BookingStatus.Cancelled => "status-badge-cancelled",
+        _ => ""
+    };
+}
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <p>No status changes recorded</p>
+    </div>
+}
+else
+{
+    <ul class="list-group history-entry-list">
+        @foreach (var entry in Model.OrderByDescending(e => e.ChangedAtUtc))
+        {
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-badge @StatusBadgeClass(entry.PreviousStatus)">@entry.PreviousStatus</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        <span class="status-badge @StatusBadgeClass(entry.NewStatus)">@entry.NewStatus</span>
+                    </div>
+                    <span class="history-entry-time">@TimeZoneInfo.ConvertTimeFromUtc(entry.ChangedAtUtc, displayTimeZone).ToString("g")</span>
+                </div>
+                <div class="history-entry-meta">
+                    By @entry.ActingUserFullName
+                    @if (!string.IsNullOrWhiteSpace(entry.Reason))
+                    {
+                        <span>&nbsp;&mdash; @entry.Reason</span>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+}

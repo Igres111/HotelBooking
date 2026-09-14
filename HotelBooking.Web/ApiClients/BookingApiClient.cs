@@ -61,6 +61,13 @@ namespace HotelBooking.Web.ApiClients
             return await ApiResponseHelper.ParseResponse<BookingResponse>(response, cancellationToken);
         }
 
+        public async Task<ResponseWrapper<List<BookingStatusHistoryResponse>>> GetHistory(int id, CancellationToken cancellationToken)
+        {
+            var response = await httpClient.GetAsync($"api/booking/{id}/history", cancellationToken);
+
+            return await ApiResponseHelper.ParseResponse<List<BookingStatusHistoryResponse>>(response, cancellationToken);
+        }
+
         public async Task<ResponseWrapper<int>> Create(CreateBookingRequest request, CancellationToken cancellationToken)
         {
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/booking")

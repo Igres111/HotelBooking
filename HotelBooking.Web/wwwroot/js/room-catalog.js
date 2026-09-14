@@ -4,7 +4,7 @@
     var debounceTimer = null;
     var currentController = null;
 
-    function loadUrl(url, historyMode) {
+    function loadUrl(url, historyMode, syncForm) {
         if (currentController) {
             currentController.abort();
         }
@@ -17,6 +17,9 @@
             .then(function (response) { return response.text(); })
             .then(function (html) {
                 results.innerHTML = html;
+                if (syncForm) {
+                    syncFormFromUrl(url);
+                }
                 if (historyMode === 'push') {
                     history.pushState({ roomCatalogUrl: url }, '', url);
                 } else if (historyMode === 'replace') {
@@ -28,6 +31,17 @@
                     showAppToast(false, 'Could not load rooms. Please try again.');
                 }
             });
+    }
+
+    function syncFormFromUrl(url) {
+        var params = new URL(url, window.location.origin).searchParams;
+
+        ['Name', 'Location', 'MinCapacity'].forEach(function (fieldName) {
+            var input = form.elements.namedItem(fieldName);
+            if (input) {
+                input.value = params.get(fieldName) || '';
+            }
+        });
     }
 
     function submitSearch(historyMode) {
@@ -61,11 +75,11 @@
         }
         event.preventDefault();
         clearTimeout(debounceTimer);
-        loadUrl(link.href, 'push');
+        loadUrl(link.href, 'push', true);
     });
 
     window.addEventListener('popstate', function () {
         clearTimeout(debounceTimer);
-        loadUrl(window.location.href, null);
+        loadUrl(window.location.href, null, true);
     });
 })();

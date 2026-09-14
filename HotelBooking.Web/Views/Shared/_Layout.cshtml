@@ -61,6 +61,10 @@
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="18" rx="2"></rect><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"></path><path d="M9 12h6"></path><path d="M9 16h6"></path></svg>
                             <span>All Bookings</span>
                         </a>
+                        <a class="sidebar-link @(IsActive("Admin", "BookingHistory") ? "active" : "")" asp-controller="Admin" asp-action="BookingHistory">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Booking History</span>
+                        </a>
                     }
                 </nav>
 

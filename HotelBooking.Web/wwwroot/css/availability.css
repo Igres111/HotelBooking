@@ -4,8 +4,23 @@
   text-align: left;
 }
 
+.room-capacity-inline {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #6c757d;
+}
+
 .recurring-btn {
   background-color: #fd7e14;
+  border-color: #fd7e14;
+}
+
+.recurring-btn:hover,
+.recurring-btn:focus,
+.recurring-btn:active {
+  background-color: #e8590c !important;
+  border-color: #e8590c !important;
+  color: #fff !important;
 }
 
 #availabilityResults {

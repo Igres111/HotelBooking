@@ -51,6 +51,20 @@ namespace HotelBooking.Web.Controllers
             return View(response.Data ?? []);
         }
 
+        public async Task<IActionResult> BookingHistory(CancellationToken cancellationToken)
+        {
+            var response = await _bookingService.GetAllForAdmin(cancellationToken);
+
+            return View(response.Data ?? []);
+        }
+
+        public async Task<IActionResult> BookingHistoryEntries(int id, CancellationToken cancellationToken)
+        {
+            var response = await _bookingService.GetHistory(id, cancellationToken);
+
+            return PartialView("_BookingHistoryEntries", response.Data ?? []);
+        }
+
         public async Task<IActionResult> ExportBookings(CancellationToken cancellationToken)
         {
             var bytes = await _bookingService.ExportFile(cancellationToken);
