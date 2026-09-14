@@ -1,3 +1,4 @@
+using HotelBooking.Filters;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
 using HotelBooking.Services.Interfaces;
@@ -40,6 +41,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">A user with this email already exists.</response>
         [HttpPost("signup")]
         [AllowAnonymous]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status409Conflict)]
@@ -69,6 +71,7 @@ namespace HotelBooking.Controllers
         /// <response code="401">Email or password is invalid.</response>
         [HttpPost("login")]
         [AllowAnonymous]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<UserResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseWrapper<UserResponse>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
@@ -100,6 +103,7 @@ namespace HotelBooking.Controllers
         /// <response code="200">Logged out successfully.</response>
         [HttpPost("logout")]
         [Authorize]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper), StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {

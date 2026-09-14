@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using HotelBooking.Filters;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
 using HotelBooking.Services.Interfaces;
@@ -51,6 +52,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">This room is already booked for the requested time slot, or the idempotency key was reused with different data.</response>
         [HttpPost]
         [Authorize]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status404NotFound)]
@@ -104,6 +106,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">One of the occurrences is already booked for the requested time slot, or the idempotency key was reused with different data.</response>
         [HttpPost("recurring")]
         [Authorize]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<List<int>>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<List<int>>), StatusCodes.Status404NotFound)]
@@ -243,6 +246,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">The booking is not pending, or the room is already booked for that time slot.</response>
         [HttpPost("{id}/confirm")]
         [Authorize(Roles = "Administrator")]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status409Conflict)]
@@ -275,6 +279,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">Only a pending booking can be rejected.</response>
         [HttpPost("{id}/reject")]
         [Authorize(Roles = "Administrator")]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status404NotFound)]
@@ -310,6 +315,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">Only a pending or confirmed booking can be cancelled.</response>
         [HttpPost("{id}/cancel")]
         [Authorize]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<BookingResponse>), StatusCodes.Status403Forbidden)]

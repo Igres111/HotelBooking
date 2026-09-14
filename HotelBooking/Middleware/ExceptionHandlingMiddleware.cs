@@ -3,6 +3,7 @@ using System.Security.Authentication;
 using System.Text.Json;
 using FluentValidation;
 using HotelBooking.Models.Responses;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -87,6 +88,7 @@ namespace HotelBooking.Middleware
         {
             ValidationException => HttpStatusCode.BadRequest,
             ArgumentException => HttpStatusCode.BadRequest,
+            AntiforgeryValidationException => HttpStatusCode.BadRequest,
             KeyNotFoundException => HttpStatusCode.NotFound,
             AuthenticationException => HttpStatusCode.Unauthorized,
             UnauthorizedAccessException => HttpStatusCode.Forbidden,
@@ -103,6 +105,8 @@ namespace HotelBooking.Middleware
                 string.Join("; ", validationException.Errors.Select(error => error.ErrorMessage)),
 
             ArgumentException => exception.Message,
+
+            AntiforgeryValidationException => "Antiforgery token validation failed.",
 
             KeyNotFoundException => exception.Message,
 

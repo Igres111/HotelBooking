@@ -1,3 +1,4 @@
+using HotelBooking.Filters;
 using HotelBooking.Models.Requests;
 using HotelBooking.Models.Responses;
 using HotelBooking.Services.Interfaces;
@@ -40,6 +41,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">A meeting room with this name already exists at this location.</response>
         [HttpPost]
         [Authorize(Roles = "Administrator")]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<int>), StatusCodes.Status409Conflict)]
@@ -170,6 +172,7 @@ namespace HotelBooking.Controllers
         /// <response code="409">A meeting room with this name already exists at this location.</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Administrator")]
+        [ValidateApiAntiforgeryToken]
         [ProducesResponseType(typeof(ResponseWrapper<MeetingRoomsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseWrapper<MeetingRoomsResponse>), StatusCodes.Status404NotFound)]

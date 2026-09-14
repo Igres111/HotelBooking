@@ -51,7 +51,7 @@ namespace HotelBooking.Web.Services
                 return new LoginResultResponse(validationResult, null, null);
             }
 
-            return new LoginResultResponse(validationResult, result.Response.Data, result.ApiAuthCookie);
+            return new LoginResultResponse(validationResult, result.Response.Data, result.ApiAuthCookie, result.ApiAntiforgeryCookie, result.ApiAntiforgeryToken);
         }
 
         public async Task<ResponseWrapper> Logout(CancellationToken cancellationToken)

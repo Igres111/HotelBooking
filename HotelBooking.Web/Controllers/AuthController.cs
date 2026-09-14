@@ -86,6 +86,16 @@ namespace HotelBooking.Web.Controllers
                 claims.Add(new Claim(ApiAuthCookieHandler.ClaimType, result.ApiAuthCookie));
             }
 
+            if (!string.IsNullOrEmpty(result.ApiAntiforgeryCookie))
+            {
+                claims.Add(new Claim(ApiAuthCookieHandler.AntiforgeryCookieClaimType, result.ApiAntiforgeryCookie));
+            }
+
+            if (!string.IsNullOrEmpty(result.ApiAntiforgeryToken))
+            {
+                claims.Add(new Claim(ApiAuthCookieHandler.AntiforgeryTokenClaimType, result.ApiAntiforgeryToken));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
