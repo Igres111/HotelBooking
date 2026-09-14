@@ -50,7 +50,7 @@ else
             <tbody>
                 @foreach (var booking in Model)
                 {
-                    <tr>
+                    <tr data-booking-row>
                         <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
                         <td>@booking.UserFullName</td>
                         <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
@@ -58,17 +58,17 @@ else
                         <td>@booking.AttendeeCount</td>
                         <td>@booking.Notes</td>
                         <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
-                        <td class="d-flex gap-2">
+                        <td class="d-flex gap-2" data-booking-actions>
                             @if (booking.Status == BookingStatus.Pending)
                             {
-                                <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@booking.Id" method="post" class="d-inline booking-action-form" data-action-type="confirm">
                                     <input type="hidden" name="returnUrl" value="@returnUrl" />
                                     <button type="submit" class="btn-confirm-action">
                                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                         Confirm
                                     </button>
                                 </form>
-                                <form asp-controller="Booking" asp-action="Reject" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <form asp-controller="Booking" asp-action="Reject" asp-route-id="@booking.Id" method="post" class="d-inline booking-action-form" data-action-type="reject">
                                     <input type="hidden" name="returnUrl" value="@returnUrl" />
                                     <button type="submit" class="btn-reject-action">
                                         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"></circle><rect x="11" y="6.5" width="2" height="6" rx="1" fill="#1a1a1a"></rect><rect x="11" y="15" width="2" height="2" rx="1" fill="#1a1a1a"></rect></svg>
@@ -78,7 +78,7 @@ else
                             }
                             @if (booking.Status == BookingStatus.Pending || booking.Status == BookingStatus.Confirmed)
                             {
-                                <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline booking-action-form" data-action-type="cancel">
                                     <input type="hidden" name="returnUrl" value="@returnUrl" />
                                     <button type="submit" class="btn-cancel-action">
                                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -94,3 +94,7 @@ else
     </div>
 }
 </div>
+
+@section Scripts {
+    <script src="~/js/booking-actions.js" asp-append-version="true"></script>
+}

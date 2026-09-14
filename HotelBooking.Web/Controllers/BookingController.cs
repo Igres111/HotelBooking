@@ -65,11 +65,19 @@ namespace HotelBooking.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookTimeSlotViewModel model, CancellationToken cancellationToken)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var validationResult = await _bookTimeSlotViewModelValidator.ValidateAsync(model, cancellationToken);
 
             if (!validationResult.IsValid)
             {
-                TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(error => error.ErrorMessage));
+                var validationMessage = string.Join(" ", validationResult.Errors.Select(error => error.ErrorMessage));
+
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = validationMessage });
+                }
+
+                TempData["ErrorMessage"] = validationMessage;
                 return RedirectToAction("Availability", "MeetingRoom", new
                 {
                     id = model.RoomId,
@@ -81,10 +89,14 @@ namespace HotelBooking.Web.Controllers
 
             var request = new CreateBookingRequest(model.RoomId, model.Date, model.StartTime, model.EndTime, model.AttendeeCount, model.Notes, model.TimeZoneId);
             var response = await _bookingService.Create(request, cancellationToken);
+            var message = response.IsSuccess ? "Booking request submitted successfully." : response.Message;
 
-            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = response.IsSuccess
-                ? "Booking request submitted successfully."
-                : response.Message;
+            if (isAjax)
+            {
+                return Json(new { success = response.IsSuccess, message });
+            }
+
+            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = message;
 
             return RedirectToAction("Availability", "MeetingRoom", new
             {
@@ -99,11 +111,19 @@ namespace HotelBooking.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRecurring(CreateRecurringBookingViewModel model, CancellationToken cancellationToken)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var validationResult = await _createRecurringBookingViewModelValidator.ValidateAsync(model, cancellationToken);
 
             if (!validationResult.IsValid)
             {
-                TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(error => error.ErrorMessage));
+                var validationMessage = string.Join(" ", validationResult.Errors.Select(error => error.ErrorMessage));
+
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = validationMessage });
+                }
+
+                TempData["ErrorMessage"] = validationMessage;
                 return RedirectToAction("Availability", "MeetingRoom", new
                 {
                     id = model.RoomId,
@@ -115,10 +135,14 @@ namespace HotelBooking.Web.Controllers
 
             var request = new CreateRecurringBookingRequest(model.RoomId, model.StartDate, model.StartTime, model.EndTime, model.AttendeeCount, model.Notes, model.TimeZoneId, model.OccurrenceCount);
             var response = await _bookingService.CreateRecurring(request, cancellationToken);
+            var message = response.IsSuccess ? "Recurring booking request submitted successfully." : response.Message;
 
-            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = response.IsSuccess
-                ? "Recurring booking request submitted successfully."
-                : response.Message;
+            if (isAjax)
+            {
+                return Json(new { success = response.IsSuccess, message });
+            }
+
+            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = message;
 
             return RedirectToAction("Availability", "MeetingRoom", new
             {
@@ -133,11 +157,16 @@ namespace HotelBooking.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id, string? returnUrl, CancellationToken cancellationToken)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var response = await _bookingService.Cancel(id, cancellationToken);
+            var message = response.IsSuccess ? "Booking cancelled successfully." : response.Message;
 
-            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = response.IsSuccess
-                ? "Booking cancelled successfully."
-                : response.Message;
+            if (isAjax)
+            {
+                return Json(new { success = response.IsSuccess, message, status = response.Data?.Status.ToString() });
+            }
+
+            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = message;
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
@@ -152,11 +181,16 @@ namespace HotelBooking.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirm(int id, string? returnUrl, CancellationToken cancellationToken)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var response = await _bookingService.Confirm(id, cancellationToken);
+            var message = response.IsSuccess ? "Booking confirmed successfully." : response.Message;
 
-            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = response.IsSuccess
-                ? "Booking confirmed successfully."
-                : response.Message;
+            if (isAjax)
+            {
+                return Json(new { success = response.IsSuccess, message, status = response.Data?.Status.ToString() });
+            }
+
+            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = message;
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
@@ -171,11 +205,16 @@ namespace HotelBooking.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id, string? returnUrl, CancellationToken cancellationToken)
         {
+            var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var response = await _bookingService.Reject(id, cancellationToken);
+            var message = response.IsSuccess ? "Booking rejected successfully." : response.Message;
 
-            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = response.IsSuccess
-                ? "Booking rejected successfully."
-                : response.Message;
+            if (isAjax)
+            {
+                return Json(new { success = response.IsSuccess, message, status = response.Data?.Status.ToString() });
+            }
+
+            TempData[response.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = message;
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {

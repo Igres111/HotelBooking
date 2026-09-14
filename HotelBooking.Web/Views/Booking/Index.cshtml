@@ -28,7 +28,7 @@
     {
         if (booking.Status == BookingStatus.Pending || booking.Status == BookingStatus.Confirmed)
         {
-            <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline">
+            <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline booking-action-form" data-action-type="cancel">
                 <button type="submit" class="btn btn-link text-danger p-0">Cancel</button>
             </form>
         }
@@ -100,14 +100,14 @@
                     <tbody>
                         @foreach (var booking in Model.Bookings.Items)
                         {
-                            <tr>
+                            <tr data-booking-row>
                                 <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>
                                 <td>@booking.Notes</td>
                                 <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
-                                <td>@{ await RenderCancelForm(booking); }</td>
+                                <td data-booking-actions>@{ await RenderCancelForm(booking); }</td>
                             </tr>
                         }
                     </tbody>
@@ -168,14 +168,14 @@
                     <tbody>
                         @foreach (var booking in Model.RecurringBookings.Items)
                         {
-                            <tr>
+                            <tr data-booking-row>
                                 <td><a asp-controller="Booking" asp-action="Details" asp-route-id="@booking.Id">@booking.RoomName</a></td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.StartUtc, displayTimeZone).ToString("g")</td>
                                 <td>@TimeZoneInfo.ConvertTimeFromUtc(booking.EndUtc, displayTimeZone).ToString("g")</td>
                                 <td>@booking.AttendeeCount</td>
                                 <td>@booking.Notes</td>
                                 <td><span class="status-badge @StatusBadgeClass(booking.Status)">@booking.Status</span></td>
-                                <td>@{ await RenderCancelForm(booking); }</td>
+                                <td data-booking-actions>@{ await RenderCancelForm(booking); }</td>
                             </tr>
                         }
                     </tbody>
@@ -185,3 +185,7 @@
       </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/booking-actions.js" asp-append-version="true"></script>
+}

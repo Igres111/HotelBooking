@@ -17,7 +17,7 @@
 <div class="availability-page">
 <h1>@Model.RoomName</h1>
 
-<form asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@Model.RoomId" method="get" class="row g-2 mb-3 justify-content-center">
+<form id="availabilityForm" asp-controller="MeetingRoom" asp-action="Availability" asp-route-id="@Model.RoomId" method="get" class="row g-2 mb-3 justify-content-center">
     <input type="hidden" name="timeZoneId" value="@Model.TimeZoneId" />
     <div class="col-auto">
         <label class="form-label">Date</label>
@@ -32,50 +32,9 @@
     </div>
 </form>
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
-}
-else if (Model.TimeSlots is null || Model.TimeSlots.Count == 0)
-{
-    <div class="empty-state">
-        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <p>No slots available</p>
-    </div>
-}
-else
-{
-    <ul class="list-group time-slot-list">
-        @foreach (var slot in Model.TimeSlots)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>@slot.StartTime - @slot.EndTime</span>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-success"
-                            data-bs-toggle="modal" data-bs-target="#bookSlotModal"
-                            data-room-id="@Model.RoomId"
-                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
-                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
-                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
-                            data-time-zone-id="@Model.TimeZoneId"
-                            data-label="@slot.StartTime - @slot.EndTime">
-                        Book this slot
-                    </button>
-                    <button type="button" class="btn btn-sm text-white recurring-btn"
-                            data-bs-toggle="modal" data-bs-target="#createRecurringModal"
-                            data-room-id="@Model.RoomId"
-                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
-                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
-                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
-                            data-time-zone-id="@Model.TimeZoneId"
-                            data-label="@slot.StartTime - @slot.EndTime">
-                        + Create Recurring Bookings
-                    </button>
-                </div>
-            </li>
-        }
-    </ul>
-}
+<div id="availabilityResults">
+    @await Html.PartialAsync("_AvailabilityResults", Model)
+</div>
 </div>
 
 <div class="modal fade" id="bookSlotModal" tabindex="-1" aria-labelledby="bookSlotModalLabel" aria-hidden="true">
@@ -87,6 +46,7 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert d-none" id="bookSlotMessage" role="alert"></div>
                     <input type="hidden" name="RoomId" id="bookSlotRoomId" />
                     <input type="hidden" name="Date" id="bookSlotDate" />
                     <input type="hidden" name="StartTime" id="bookSlotStartTime" />
@@ -119,6 +79,7 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert d-none" id="recurMessage" role="alert"></div>
                     <input type="hidden" name="RoomId" id="recurRoomId" />
                     <input type="hidden" name="StartDate" id="recurStartDate" />
                     <input type="hidden" name="StartTime" id="recurStartTime" />

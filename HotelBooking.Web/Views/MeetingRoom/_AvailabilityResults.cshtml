@@ -1,0 +1,47 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model HotelBooking.Web.Models.ViewModels.RoomAvailabilityViewModel
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+else if (Model.TimeSlots is null || Model.TimeSlots.Count == 0)
+{
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <p>No slots available</p>
+    </div>
+}
+else
+{
+    <ul class="list-group time-slot-list">
+        @foreach (var slot in Model.TimeSlots)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@slot.StartTime - @slot.EndTime</span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-success"
+                            data-bs-toggle="modal" data-bs-target="#bookSlotModal"
+                            data-room-id="@Model.RoomId"
+                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
+                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
+                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
+                            data-time-zone-id="@Model.TimeZoneId"
+                            data-label="@slot.StartTime - @slot.EndTime">
+                        Book this slot
+                    </button>
+                    <button type="button" class="btn btn-sm text-white recurring-btn"
+                            data-bs-toggle="modal" data-bs-target="#createRecurringModal"
+                            data-room-id="@Model.RoomId"
+                            data-date="@Model.Date.ToString("yyyy-MM-dd")"
+                            data-start-time="@slot.StartTime.ToString("HH:mm:ss")"
+                            data-end-time="@slot.EndTime.ToString("HH:mm:ss")"
+                            data-time-zone-id="@Model.TimeZoneId"
+                            data-label="@slot.StartTime - @slot.EndTime">
+                        + Create Recurring Bookings
+                    </button>
+                </div>
+            </li>
+        }
+    </ul>
+}

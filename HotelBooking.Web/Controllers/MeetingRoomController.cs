@@ -71,6 +71,11 @@ namespace HotelBooking.Web.Controllers
                 viewModel.TimeSlots = availabilityResponse.Data;
             }
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_AvailabilityResults", viewModel);
+            }
+
             return View(viewModel);
         }
     }

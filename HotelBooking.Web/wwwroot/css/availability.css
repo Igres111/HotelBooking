@@ -8,6 +8,15 @@
   background-color: #fd7e14;
 }
 
+#availabilityResults {
+  transition: opacity 0.15s ease-in-out;
+}
+
+#availabilityResults.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 @media (max-width: 576px) {
   .time-slot-list .list-group-item {
     flex-direction: column;

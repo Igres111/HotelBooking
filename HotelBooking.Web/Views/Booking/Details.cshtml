@@ -26,7 +26,7 @@
     Back to My Bookings
 </a>
 
-<div class="availability-page">
+<div class="availability-page" data-booking-row>
 <h1>Booking Details</h1>
 
 <div class="detail-rows">
@@ -95,17 +95,17 @@
     </div>
 </div>
 
-<div class="d-flex gap-2 mt-3 justify-content-center">
+<div class="d-flex gap-2 mt-3 justify-content-center" data-booking-actions>
     @if (Model.Status == BookingStatus.Pending && User.IsInRole("Administrator"))
     {
-        <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@Model.Id" method="post" class="d-inline">
+        <form asp-controller="Booking" asp-action="Confirm" asp-route-id="@Model.Id" method="post" class="d-inline booking-action-form" data-action-type="confirm">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
             <button type="submit" class="btn-confirm-action btn-lg-action">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 Confirm
             </button>
         </form>
-        <form asp-controller="Booking" asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline">
+        <form asp-controller="Booking" asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline booking-action-form" data-action-type="reject">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
             <button type="submit" class="btn-reject-action btn-lg-action">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -115,7 +115,7 @@
     }
     @if (Model.Status == BookingStatus.Pending || Model.Status == BookingStatus.Confirmed)
     {
-        <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline">
+        <form asp-controller="Booking" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline booking-action-form" data-action-type="cancel">
             <input type="hidden" name="returnUrl" value="@returnUrl" />
             <button type="submit" class="btn-cancel-action btn-lg-action">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -125,3 +125,7 @@
     }
 </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/booking-actions.js" asp-append-version="true"></script>
+}

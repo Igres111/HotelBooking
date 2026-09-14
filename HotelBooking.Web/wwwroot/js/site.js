@@ -32,3 +32,40 @@
         }
     });
 })();
+
+document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!form.classList || !form.classList.contains('disable-on-submit')) {
+        return;
+    }
+
+    var submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+    }
+});
+
+function showAppToast(success, message) {
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.className = 'toast-stack';
+        document.body.appendChild(stack);
+    }
+
+    var toast = document.createElement('div');
+    toast.className = 'app-toast ' + (success ? 'app-toast-success' : 'app-toast-error');
+    toast.textContent = message;
+    stack.appendChild(toast);
+
+    requestAnimationFrame(function () {
+        toast.classList.add('show');
+    });
+
+    setTimeout(function () {
+        toast.classList.remove('show');
+        setTimeout(function () {
+            toast.remove();
+        }, 200);
+    }, 3000);
+}

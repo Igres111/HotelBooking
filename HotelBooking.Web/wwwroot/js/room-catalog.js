@@ -2,9 +2,18 @@
     var form = document.getElementById('roomSearchForm');
     var results = document.getElementById('roomResults');
     var debounceTimer = null;
+    var currentController = null;
 
     function loadUrl(url, historyMode) {
-        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        if (currentController) {
+            currentController.abort();
+        }
+        currentController = new AbortController();
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            signal: currentController.signal
+        })
             .then(function (response) { return response.text(); })
             .then(function (html) {
                 results.innerHTML = html;
@@ -12,6 +21,11 @@
                     history.pushState({ roomCatalogUrl: url }, '', url);
                 } else if (historyMode === 'replace') {
                     history.replaceState({ roomCatalogUrl: url }, '', url);
+                }
+            })
+            .catch(function (error) {
+                if (error.name !== 'AbortError') {
+                    showAppToast(false, 'Could not load rooms. Please try again.');
                 }
             });
     }

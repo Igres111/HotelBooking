@@ -76,7 +76,7 @@ else
 <div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form asp-controller="Admin" asp-action="CreateRoom" method="post">
+            <form asp-controller="Admin" asp-action="CreateRoom" method="post" class="disable-on-submit">
                 <div class="modal-header">
                     <h5 class="modal-title" id="createRoomModalLabel">Create a New Room</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -119,7 +119,7 @@ else
 <div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="editRoomForm" method="post" asp-antiforgery="true">
+            <form id="editRoomForm" method="post" asp-antiforgery="true" class="disable-on-submit">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editRoomModalLabel">Edit Room</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
