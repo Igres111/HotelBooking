@@ -20,10 +20,6 @@ namespace HotelBooking.Controllers
         /// the matching cookie is set on the response.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/antiforgery/token
-        ///
         /// Send the returned token back on state-changing requests via the X-CSRF-TOKEN header.
         /// </remarks>
         /// <response code="200">Token issued.</response>

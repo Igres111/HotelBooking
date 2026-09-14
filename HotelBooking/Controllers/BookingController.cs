@@ -24,20 +24,6 @@ namespace HotelBooking.Controllers
         /// Creates a new booking for a meeting room.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/booking
-        ///     Idempotency-Key: 3f29c1e2-5e3a-4b7a-9c2d-8a1e6f0b2b31
-        ///     {
-        ///         "roomId": 1,
-        ///         "date": "2026-09-15",
-        ///         "startTime": "10:00",
-        ///         "endTime": "11:00",
-        ///         "attendeeCount": 5,
-        ///         "notes": "Team meeting",
-        ///         "timeZoneId": "Asia/Tbilisi"
-        ///     }
-        ///
         /// startTime/endTime are local to timeZoneId - the server converts them to UTC for storage.
         /// The booking is created with Pending status.
         ///
@@ -73,21 +59,6 @@ namespace HotelBooking.Controllers
         /// Creates a weekly recurring booking, atomically.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/booking/recurring
-        ///     Idempotency-Key: 3f29c1e2-5e3a-4b7a-9c2d-8a1e6f0b2b31
-        ///     {
-        ///         "roomId": 1,
-        ///         "startDate": "2026-09-15",
-        ///         "startTime": "10:00",
-        ///         "endTime": "11:00",
-        ///         "attendeeCount": 5,
-        ///         "notes": "Weekly sync",
-        ///         "timeZoneId": "Asia/Tbilisi",
-        ///         "occurrenceCount": 4
-        ///     }
-        ///
         /// Occurrences repeat weekly starting from startDate, up to 4 total. Every occurrence is
         /// validated independently (future date, business hours, capacity, 30-day advance window,
         /// overlap with a confirmed booking) - if any single occurrence fails, none are created.
@@ -127,10 +98,6 @@ namespace HotelBooking.Controllers
         /// Retrieves the current user's own bookings, with filtering, sorting, and pagination.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/booking?status=Pending&amp;isRecurring=false&amp;sortBy=startutc&amp;sortDescending=true&amp;page=1&amp;pageSize=20
-        ///
         /// sortBy accepts "startutc" or "status" (defaults to "startutc"). isRecurring filters to
         /// bookings that were created as part of a recurring series (true) or standalone bookings
         /// (false); omit it to return both. Only bookings belonging to the current user are returned -
@@ -265,13 +232,6 @@ namespace HotelBooking.Controllers
         /// <remarks>
         /// Administrator role required. The request body is optional; an optional reason may be
         /// supplied and is recorded in the booking's status history.
-        ///
-        /// Sample request:
-        ///
-        ///     POST /api/booking/1/reject
-        ///     {
-        ///         "reason": "Room needed for maintenance"
-        ///     }
         /// </remarks>
         /// <response code="200">Booking rejected successfully.</response>
         /// <response code="400">Reason exceeds the maximum length.</response>
@@ -300,13 +260,6 @@ namespace HotelBooking.Controllers
         /// Any authenticated user may call this - an Employee may only cancel their own booking,
         /// while an Administrator may cancel any booking. The request body is optional; an optional
         /// reason may be supplied and is recorded in the booking's status history.
-        ///
-        /// Sample request:
-        ///
-        ///     POST /api/booking/1/cancel
-        ///     {
-        ///         "reason": "Meeting no longer needed"
-        ///     }
         /// </remarks>
         /// <response code="200">Booking cancelled successfully.</response>
         /// <response code="400">Reason exceeds the maximum length.</response>

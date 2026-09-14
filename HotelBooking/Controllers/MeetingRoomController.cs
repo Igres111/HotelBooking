@@ -22,18 +22,6 @@ namespace HotelBooking.Controllers
         /// Creates a new meeting room.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/meetingroom
-        ///     {
-        ///         "name": "Conference Room A",
-        ///         "description": "Large room with a projector",
-        ///         "location": "Building 1, Floor 2",
-        ///         "capacity": 10,
-        ///         "openingTime": "08:00",
-        ///         "closingTime": "18:00"
-        ///     }
-        ///
         /// Administrator role required.
         /// </remarks>
         /// <response code="201">Meeting room created successfully.</response>
@@ -56,14 +44,8 @@ namespace HotelBooking.Controllers
         /// Retrieves active meeting rooms, with search, filtering, sorting, and pagination.
         /// </summary>
         /// <remarks>
-        /// Employee or Administrator role required. Deactivated rooms are excluded - use
-        /// GET /api/meetingroom/admin for the unfiltered admin view.
-        ///
-        /// Sample request:
-        ///
-        ///     GET /api/meetingroom?name=conference&amp;location=Tbilisi&amp;minCapacity=5&amp;sortBy=capacity&amp;sortDescending=true&amp;page=1&amp;pageSize=20
-        ///
-        /// sortBy accepts "name", "location", or "capacity" (defaults to "name").
+        /// Excludes deactivated rooms - see GET /api/meetingroom/admin for those. sortBy accepts
+        /// "name", "location", or "capacity" (defaults to "name").
         /// </remarks>
         /// <response code="200">Meeting rooms retrieved successfully.</response>
         [HttpGet]
@@ -96,16 +78,9 @@ namespace HotelBooking.Controllers
         /// Retrieves the available time slots for a room on a given date, for a requested duration.
         /// </summary>
         /// <remarks>
-        /// Employee or Administrator role required.
-        ///
-        /// Sample request:
-        ///
-        ///     GET /api/meetingroom/1/availability?date=2026-09-20&amp;durationMinutes=60&amp;timeZoneId=Asia/Tbilisi
-        ///
-        /// date and timeZoneId are interpreted together as the room's local calendar day; returned
-        /// slot times are also local to timeZoneId. Only slots that fit entirely within the room's
-        /// business hours and do not overlap a Confirmed booking are returned - Pending, Rejected,
-        /// and Cancelled bookings never block availability, and back-to-back slots are allowed.
+        /// date and returned slot times are local to timeZoneId. Only slots within business hours
+        /// that don't overlap a Confirmed booking are returned - Pending, Rejected, and Cancelled
+        /// bookings never block availability, and back-to-back slots are allowed.
         /// </remarks>
         /// <response code="200">Availability retrieved successfully.</response>
         /// <response code="400">Validation failed.</response>
@@ -126,15 +101,8 @@ namespace HotelBooking.Controllers
         /// Retrieves the occupied hours for a room on a given date, within a given time window.
         /// </summary>
         /// <remarks>
-        /// Employee or Administrator role required.
-        ///
-        /// Sample request:
-        ///
-        ///     GET /api/meetingroom/1/occupied-hours?date=2026-09-20&amp;fromTime=09:00&amp;toTime=18:00&amp;timeZoneId=Asia/Tbilisi
-        ///
-        /// date, fromTime, toTime, and timeZoneId are interpreted together as a local time window;
-        /// returned time ranges are also local to timeZoneId. Only Confirmed bookings that overlap
-        /// the window are returned - Pending, Rejected, and Cancelled bookings are never occupying.
+        /// date, fromTime, and toTime are local to timeZoneId. Only overlapping Confirmed bookings
+        /// are returned - Pending, Rejected, and Cancelled bookings are never occupying.
         /// </remarks>
         /// <response code="200">Occupied hours retrieved successfully.</response>
         /// <response code="400">Validation failed.</response>
@@ -155,16 +123,7 @@ namespace HotelBooking.Controllers
         /// Updates a meeting room. Any field may be omitted (or null) to leave it unchanged.
         /// </summary>
         /// <remarks>
-        /// Also used to activate/deactivate a room via the isActive field.
-        ///
-        /// Sample request:
-        ///
-        ///     PUT /api/meetingroom/1
-        ///     {
-        ///         "isActive": false
-        ///     }
-        ///
-        /// Administrator role required.
+        /// Also used to activate/deactivate a room via the isActive field. Administrator role required.
         /// </remarks>
         /// <response code="200">Meeting room updated successfully.</response>
         /// <response code="400">Validation failed, or the resulting opening time is not before the closing time.</response>

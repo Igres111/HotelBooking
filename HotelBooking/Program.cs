@@ -1,16 +1,6 @@
 using DotNetEnv;
-using FluentValidation;
-using HotelBooking.Data;
+using HotelBooking.DI;
 using HotelBooking.Middleware;
-using HotelBooking.Models.Requests;
-using HotelBooking.Repositories;
-using HotelBooking.Repositories.BaseRepository;
-using HotelBooking.Repositories.Interfaces;
-using HotelBooking.Services;
-using HotelBooking.Services.Interfaces;
-using HotelBooking.Validators;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Env.Load();
@@ -25,57 +15,14 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
-
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
-builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IIdempotencyRecordRepository, IdempotencyRecordRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
-builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddSingleton<ITimeZoneConverter, TimeZoneConverter>();
-builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
-builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
-builder.Services.AddScoped<IValidator<CreateMeetingRoomRequest>, CreateMeetingRoomRequestValidator>();
-builder.Services.AddScoped<IValidator<UpdateMeetingRoomRequest>, UpdateMeetingRoomRequestValidator>();
-builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
-builder.Services.AddScoped<IValidator<CreateRecurringBookingRequest>, CreateRecurringBookingRequestValidator>();
-builder.Services.AddScoped<IValidator<GetRoomAvailabilityRequest>, GetRoomAvailabilityRequestValidator>();
-builder.Services.AddScoped<IValidator<GetOccupiedHoursRequest>, GetOccupiedHoursRequestValidator>();
-builder.Services.AddScoped<IValidator<GetDashboardRequest>, GetDashboardRequestValidator>();
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "HotelBooking.Auth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.SlidingExpiration = true;
-    });
-
-builder.Services.AddAntiforgery(options =>
-{
-    options.HeaderName = "X-CSRF-TOKEN";
-    options.Cookie.Name = "HotelBooking.Antiforgery";
-});
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
-});
+builder.Services.AddDatabase(connectionString);
+builder.Services.AddApiCore();
+builder.Services.AddRepositories();
+builder.Services.AddApplicationServices();
+builder.Services.AddValidators();
+builder.Services.AddAppAuthentication();
+builder.Services.AddAppAntiforgery();
+builder.Services.AddSwaggerDocumentation();
 
 var app = builder.Build();
 

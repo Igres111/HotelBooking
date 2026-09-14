@@ -25,16 +25,7 @@ namespace HotelBooking.Controllers
         /// Registers a new employee account.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/auth/signup
-        ///     {
-        ///         "fullName": "Jane Doe",
-        ///         "email": "jane@example.com",
-        ///         "password": "Passw0rd!"
-        ///     }
-        ///
-        /// The account is always created with the Employee role - role cannot be set by the caller.
+        /// Always created with the Employee role - role cannot be set by the caller.
         /// </remarks>
         /// <response code="201">User registered successfully.</response>
         /// <response code="400">Validation failed.</response>
@@ -56,16 +47,7 @@ namespace HotelBooking.Controllers
         /// Authenticates a user and signs them in with a cookie-based session.
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/auth/login
-        ///     {
-        ///         "email": "jane@example.com",
-        ///         "password": "Passw0rd!"
-        ///     }
-        ///
-        /// On success, an authentication cookie is issued and the response body carries the
-        /// authenticated user's id, email, and role.
+        /// On success, an authentication cookie is issued.
         /// </remarks>
         /// <response code="200">Login successful.</response>
         /// <response code="401">Email or password is invalid.</response>
